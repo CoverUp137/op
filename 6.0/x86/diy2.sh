@@ -23,8 +23,8 @@ sed -i 's/192.168.1.1/192.168.2.9/g' package/base-files/files/bin/config_generat
 #sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
  
 # 修改默认主机名
-sed -i '/uci commit system/i\uci set system.@system[0].hostname='windyday_op'' package/lean/default-settings/files/zzz-default-settings
+#sed -i '/uci commit system/i\uci set system.@system[0].hostname='windyday_op'' package/lean/default-settings/files/zzz-default-settings
  
 # 加入编译者信息
-sed -i "s/OpenWrt /Windyday build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
+#sed -i "s/OpenWrt /Windyday build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
  
