@@ -20,7 +20,7 @@ sed -i 's/192.168.1.1/192.168.2.9/g' package/base-files/files/bin/config_generat
 # sed -i '/small/d' /etc/opkg/distfeeds.conf
 #sed -i 's/luci-theme-bootstrap/luci-theme-neobird/g' feeds/luci/collections/luci/Makefile
 
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
+#sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
  
 # 修改默认主机名
 sed -i '/uci commit system/i\uci set system.@system[0].hostname='windyday_op'' package/lean/default-settings/files/zzz-default-settings
