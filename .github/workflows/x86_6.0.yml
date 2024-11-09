@@ -107,8 +107,7 @@ jobs:
 
         
           sudo -E apt-get -qq update
-          sudo -E apt-get binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev \
-          make4.1+ perl python3.7+ rsync subversion unzip which
+          
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "$TZ"
