@@ -20,8 +20,8 @@ on:
         default: 'false'
 
 env:
-  REPO_URL: https://github.com/Lienol/openwrt.git
-  REPO_BRANCH: 24.10
+  REPO_URL: https://github.com/CoverUp137/openwrt.git
+  REPO_BRANCH: op-24.10
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: x86.config
   DIY_P1_SH: 6.0/x86/diy1.sh
