@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: x86_immortalwrt
+name: x86_Lienol
 
 on:
   repository_dispatch:
@@ -20,8 +20,8 @@ on:
         default: 'false'
 
 env:
-  REPO_URL: https://github.com/immortalwrt/immortalwrt.git
-  REPO_BRANCH: openwrt-24.10
+  REPO_URL: https://github.com/Lienol/openwrt.git
+  REPO_BRANCH: 24.10
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: x86.config
   DIY_P1_SH: 6.0/x86/diy1.sh
@@ -107,7 +107,8 @@ jobs:
 
         
           sudo -E apt-get -qq update
-          sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
+          sudo -E apt-get binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev \
+          make4.1+ perl python3.7+ rsync subversion unzip which
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "$TZ"
@@ -201,7 +202,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")+X86_immortalwrt"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")+X86_Lienol"
         touch release.txt
         [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
