@@ -86,9 +86,6 @@ jobs:
     - name: 更新 feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    - name: 删除冲突
-      run: cd openwrt && rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd*,miniupnpd-iptables,wireless-regdb}
-
     - name: 安装 feeds
       run: cd openwrt && ./scripts/feeds install -a
 
