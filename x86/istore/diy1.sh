@@ -25,4 +25,4 @@
 # rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd-alt,miniupnpd-iptables,wireless-regdb}
 #sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
 # rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd-alt,miniupnpd-iptables,wireless-regdb}
-echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo.git;main" >>feeds.conf.default
+echo 'src-git mihomo https://github.com/morytyann/OpenWrt-mihomo.git;main' >>feeds.conf.default
