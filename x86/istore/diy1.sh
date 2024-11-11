@@ -31,6 +31,6 @@ git clone https://github.com/CoverUp137/sirpdboy-package.git package/sirpdboy-pa
 git clone  https://github.com/gdy666/luci-app-lucky.git package/lucky
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 #git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
-git clone https://github.com/sirpdboy/luci-app-wizard package/luci-app-wizard
+#git clone https://github.com/sirpdboy/luci-app-wizard package/luci-app-wizard
 git clone https://github.com/sirpdboy/myautocore package/myautocore
 #git clone https://github.com/sirpdboy/netspeedtest.git package/netspeedtest
