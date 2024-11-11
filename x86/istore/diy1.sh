@@ -29,3 +29,5 @@ echo 'src-git mihomo https://github.com/morytyann/OpenWrt-mihomo.git;main' >> fe
 echo 'src-git istore https://github.com/linkease/istore;main' >> feeds.conf.default
 git clone  https://github.com/gdy666/luci-app-lucky.git package/lucky
 git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
+git clone https://github.com/sirpdboy/luci-app-wizard package/luci-app-wizard
+git clone https://github.com/sirpdboy/myautocore package/myautocore
