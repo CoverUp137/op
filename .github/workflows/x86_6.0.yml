@@ -122,7 +122,23 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "status=success" >> ${GITHUB_OUTPUT}
+    - name: TG推送
+      if: steps.compile.outputs.status == 'success' && !cancelled()
+      env:
+        TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+      run: |
+        MESSAGE="💻 OpenWrt 编译成功！\n\n"\
+         "📂 架构: x86-64\n"\
+         "🌳 分支: ${{ env.REPO_BRANCH }}\n"\
+         "⏱️ 编译时间: $(date +"%Y年%m月%d日 %H:%M:%S")\n"\
+         "🔗 固件下载地址: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
+        curl -s -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
+        -d chat_id="${TG_CHAT_ID}" \
+        -d text="$MESSAGE" \
+        -d parse_mode="Markdown"
+        
     - name: 检查磁盘空间
       if: (!cancelled())
       run: df -hT
