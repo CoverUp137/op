@@ -21,7 +21,7 @@ sed -i ' s/KERNEL_PATCHVER:=6.6/KERNEL_PATCHVER:=6.12/g ' target/linux/x86/Makef
 # sed -i '/small/d' /etc/opkg/distfeeds.conf
 #sed -i 's/luci-theme-bootstrap/luci-theme-neobird/g' feeds/luci/collections/luci/Makefile
 
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
+#sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
  
 # 修改默认主机名
 #sed -i '/uci commit system/i\uci set system.@system[0].hostname='windyday_op'' package/lean/default-settings/files/zzz-default-settings
