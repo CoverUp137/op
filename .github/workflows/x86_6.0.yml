@@ -122,6 +122,7 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "status=success" >> ${GITHUB_OUTPUT}
+        
     - name: TG推送
       if: steps.compile.outputs.status == 'success' && !cancelled()
       env:
