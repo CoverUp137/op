@@ -20,10 +20,10 @@ on:
         default: 'false'
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede.git
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
+  REPO_BRANCH: kernel-6.12
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86/istore/ax1800.config
+  CONFIG_FILE: x86/istore/LiBwrtax1800.config
   DIY_P1_SH: x86/istore/diy1.sh
   DIY_P2_SH: x86/istore/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -203,7 +203,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")+LEDE6.6-JDC-AX1800PRO-nowifi"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")+LiBwrt6.12-JDC-AX1800PRO-nowifi"
         touch release.txt
         [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
