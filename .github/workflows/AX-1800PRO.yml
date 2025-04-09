@@ -23,7 +23,7 @@ env:
   REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
   REPO_BRANCH: kernel-6.12
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86/istore/jdg-docker.config
+  CONFIG_FILE: x86/istore/jdg.config
   DIY_P1_SH: x86/istore/diy1.sh
   DIY_P2_SH: x86/istore/diy2.sh
   UPLOAD_BIN_DIR: false
