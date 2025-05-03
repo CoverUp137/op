@@ -20,12 +20,12 @@ on:
         default: 'false'
 
 env:
-  REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
-  REPO_BRANCH: 24.10-6.12
+  REPO_URL: https://github.com/immortalwrt/immortalwrt.git
+  REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: jdc1800/aa1800.config
-  DIY_P1_SH: jdc1800/diy1.sh
-  DIY_P2_SH: jdc1800/diy2.sh
+  CONFIG_FILE: immortalwrtARM/ax6s/ax6s.config
+  DIY_P1_SH: immortalwrtARM/ax6s/diy1.sh
+  DIY_P2_SH: immortalwrtARM/ax6s/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
