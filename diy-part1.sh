@@ -18,4 +18,4 @@
 #echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.default
 #echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 #echo 'src-git istore https://github.com/linkease/istore;main' >> feeds.conf.default
-git clone https://github.com/bricco1981/MT7622-mtkwifi.git package/MT7622-mtkwifi
+#git clone https://github.com/bricco1981/MT7622-mtkwifi.git package/MT7622-mtkwifi
