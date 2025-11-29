@@ -1,14 +1,4 @@
-#
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-#
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# Description: Build OpenWrt using GitHub Actions
-#
-
-name: netcore-n60pro
+name: leike-n60pro
 
 on:
   repository_dispatch:
@@ -44,7 +34,7 @@ jobs:
       run: |
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: leike-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 仓库: ${{ github.repository }}%0A🔄 分支: ${{ github.ref }}%0A%0A⏳ 编译进行中..." \
+        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: netcore-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 源码仓库: ${{ env.REPO_URL }}%0A🔄 源码分支: ${{ env.REPO_BRANCH }}%0A🏷️ 工作流分支: ${{ github.ref }}%0A%0A⏳ 编译进行中..." \
         -d "disable_web_page_preview=true"
 
     - name: Initialization environment
@@ -59,11 +49,20 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
 
     - name: Clone source code
+      id: clone
       working-directory: /workdir
       run: |
         df -hT $PWD
+        echo "正在克隆源码仓库..."
+        echo "仓库地址: ${{ env.REPO_URL }}"
+        echo "分支: ${{ env.REPO_BRANCH }}"
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        # 记录实际使用的源码信息
+        cd openwrt
+        echo "源码版本信息:"
+        git log -1 --oneline
+        echo "::set-output name=source_commit::$(git rev-parse --short HEAD)"
 
     - name: Load custom feeds
       run: |
@@ -107,7 +106,7 @@ jobs:
       run: |
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=📥 软件包下载完成%0A%0A✅ 所有依赖包已就绪%0A⏳ 开始编译固件..." \
+        -d "text=📥 软件包下载完成%0A%0A✅ 所有依赖包已就绪%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A⏳ 开始编译固件..." \
         -d "disable_web_page_preview=true"
 
     - name: Compile the firmware
@@ -126,7 +125,7 @@ jobs:
       run: |
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=✅ 固件编译成功%0A%0A📦 设备: ${{ env.DEVICE_NAME }}%0A📅 时间: ${{ env.FILE_DATE }}%0A%0A📤 正在上传文件..." \
+        -d "text=✅ 固件编译成功%0A%0A📦 设备: ${{ env.DEVICE_NAME }}%0A📅 时间: ${{ env.FILE_DATE }}%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A%0A📤 正在上传文件..." \
         -d "disable_web_page_preview=true"
 
     - name: Send compile failure notification
@@ -134,7 +133,7 @@ jobs:
       run: |
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=❌ 固件编译失败%0A%0A⚠️ 请检查编译日志%0A🔍 查看错误信息%0A%0A📎 工作流: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+        -d "text=❌ 固件编译失败%0A%0A⚠️ 请检查编译日志%0A🔍 查看错误信息%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A%0A📎 工作流: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
         -d "disable_web_page_preview=true"
 
     - name: Check space usage
@@ -168,7 +167,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-hanwckf-5.4-netcore-n60pro"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-${{ env.REPO_BRANCH }}-n60pro"
         touch release.txt
         echo "::set-output name=status::success"
 
@@ -190,7 +189,7 @@ jobs:
         
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🎉 OpenWrt 编译完成%0A%0A✅ 所有步骤已完成%0A📦 设备: ${{ env.DEVICE_NAME }}%0A🏷️ 版本: ${{ steps.tag.outputs.release_tag }}%0A%0A🔗 下载地址:%0A• Releases: $RELEASE_URL%0A• Artifacts: $ARTIFACT_URL%0A%0A⏱️ 编译时间: $(date +'%Y-%m-%d %H:%M:%S')" \
+        -d "text=🎉 OpenWrt 编译完成%0A%0A✅ 所有步骤已完成%0A📦 设备: ${{ env.DEVICE_NAME }}%0A🏷️ 版本: ${{ steps.tag.outputs.release_tag }}%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A%0A🔗 下载地址:%0A• Releases: $RELEASE_URL%0A• Artifacts: $ARTIFACT_URL%0A%0A⏱️ 编译时间: $(date +'%Y-%m-%d %H:%M:%S')" \
         -d "disable_web_page_preview=true"
 
     - name: Send workflow cancelled notification
@@ -198,5 +197,5 @@ jobs:
       run: |
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=⏹️ 编译任务已取消%0A%0A❌ 工作流被手动取消%0A📎 详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+        -d "text=⏹️ 编译任务已取消%0A%0A❌ 工作流被手动取消%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
         -d "disable_web_page_preview=true"
