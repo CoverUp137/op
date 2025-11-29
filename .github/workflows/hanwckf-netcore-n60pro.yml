@@ -1,4 +1,4 @@
-name: netcore-n60pro
+name: hanwckf-netcore-n60pro
 
 on:
   repository_dispatch:
@@ -34,7 +34,7 @@ jobs:
       run: |
         curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: netcore-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 源码仓库: ${{ env.REPO_URL }}%0A🔄 源码分支: ${{ env.REPO_BRANCH }}%0A🏷️ 工作流分支: ${{ github.ref }}%0A%0A⏳ 编译进行中..." \
+        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: hanwckf-5.4-netcore-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 源码仓库: ${{ env.REPO_URL }}%0A🔄 源码分支: ${{ env.REPO_BRANCH }}%0A%0A⏳ 编译进行中..." \
         -d "disable_web_page_preview=true"
 
     - name: Initialization environment
