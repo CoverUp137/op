@@ -1,16 +1,27 @@
-name: LEDE-netcore-n60pro
+#
+# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+# https://github.com/P3TERX/Actions-OpenWrt
+# Description: Build OpenWrt using GitHub Actions
+#
+
+name: lede-6.6-n60pro
 
 on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      ssh:
-        description: 'SSH connection to Actions'
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
         required: false
-        default: 'false'
+        default: false
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede.git
+  REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: lede-6.6-n60pro.config
@@ -23,39 +34,39 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-
+    runs-on: self-hosted
+           
     steps:
-    #- name: Checkout
+
+     - name: Free Disk Space (Ubuntu)
+       uses: jlumbroso/free-disk-space@main
+    #   with:
+    #     # this might remove tools that are actually needed,
+    #     # if set to "true" but frees about 6 GB
+         tool-cache: false
+        
+    #     # all of these default to true, but feel free to set to
+    #     # "false" if necessary for your workflow
+         android: true
+         dotnet: true
+         haskell: true
+         large-packages: true
+         docker-images: true
+         swap-storage: true
+        
+    -# name: Checkout
     #  uses: actions/checkout@main
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
-      with:
-    # this might remove tools that are actually needed,
-    # if set to "true" but frees about 6 GB
-       tool-cache: true
-    
-    # all of these default to true, but feel free to set to
-    # "false" if necessary for your workflow
-       android: true
-       dotnet: true
-       haskell: true
-       large-packages: true
-       swap-storage: true
-
-    - name: Send start notification to Telegram
-      if: always()
+      
+    - name: Disk space
       run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: lede-6.6-netcore-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 源码仓库: ${{ env.REPO_URL }}%0A🔄 源码分支: ${{ env.REPO_BRANCH }}%0A%0A⏳ 编译进行中..." \
-        -d "disable_web_page_preview=true"
-
+           echo "Free space:"
+           df -h
+           
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        docker rmi `docker images -q`
+        # sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
         sudo -E apt-get -qq full-upgrade
         sudo -E apt-get -qq install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
@@ -70,26 +81,14 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-          
-    - name: Check space usage2
-      if: (!cancelled())
-      run: df -hT
 
     - name: Clone source code
-      id: clone
       working-directory: /workdir
       run: |
         df -hT $PWD
-        echo "正在克隆源码仓库..."
-        echo "仓库地址: ${{ env.REPO_URL }}"
-        echo "分支: ${{ env.REPO_BRANCH }}"
+        sudo rm -rf /workdir/openwrt/
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        # 记录实际使用的源码信息
-        cd openwrt
-        echo "源码版本信息:"
-        git log -1 --oneline
-        echo "::set-output name=source_commit::$(git rev-parse --short HEAD)"
 
     - name: Load custom feeds
       run: |
@@ -112,12 +111,10 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
-    - name: SSH connection to Actions
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    # - name: Debugging with tmate
+    #   # Enable tmate debugging of manually-triggered workflows if the input option was provided
+    #   uses: mxschmitt/action-tmate@v3
+    #   if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
 
     - name: Download package
       id: package
@@ -128,41 +125,21 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Send download complete notification
-      if: always() && steps.package.outcome == 'success'
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=📥 软件包下载完成%0A%0A✅ 所有依赖包已就绪%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A⏳ 开始编译固件..." \
-        -d "disable_web_page_preview=true"
-
     - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
+        # echo "{status}={success}" >> $GITHUB_OUTPUT
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-
-    - name: Send compile success notification
-      if: steps.compile.outputs.status == 'success'
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=✅ 固件编译成功%0A%0A📦 设备: ${{ env.DEVICE_NAME }}%0A📅 时间: ${{ env.FILE_DATE }}%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A%0A📤 正在上传文件..." \
-        -d "disable_web_page_preview=true"
-
-    - name: Send compile failure notification
-      if: steps.compile.outputs.status != 'success' && failure()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=❌ 固件编译失败%0A%0A⚠️ 请检查编译日志%0A🔍 查看错误信息%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A%0A📎 工作流: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-        -d "disable_web_page_preview=true"
-
+        echo '######################'
+        echo $GITHUB_ENV
+        echo '######################'
+        
     - name: Check space usage
       if: (!cancelled())
       run: df -hT
@@ -181,8 +158,9 @@ jobs:
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        # echo "{status}={success}" >> $GITHUB_OUTPUT
         echo "::set-output name=status::success"
-
+        
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
@@ -194,9 +172,11 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-${{ env.REPO_BRANCH }}-Lede-6.6-n60pro"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-lede-6.6-n60pro"
+        # echo "{release_tag}={$(date +"%Y.%m.%d-%H%M")}" >> $GITHUB_OUTPUT
         touch release.txt
         echo "::set-output name=status::success"
+        # echo "{status}={success}" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
@@ -207,22 +187,3 @@ jobs:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
-
-    - name: Send final success notification
-      if: steps.tag.outputs.status == 'success'
-      run: |
-        RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.release_tag }}"
-        ARTIFACT_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🎉 OpenWrt 编译完成%0A%0A✅ 所有步骤已完成%0A📦 设备: ${{ env.DEVICE_NAME }}%0A🏷️ 版本: ${{ steps.tag.outputs.release_tag }}%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A%0A🔗 下载地址:%0A• Releases: $RELEASE_URL%0A• Artifacts: $ARTIFACT_URL%0A%0A⏱️ 编译时间: $(date +'%Y-%m-%d %H:%M:%S')" \
-        -d "disable_web_page_preview=true"
-
-    - name: Send workflow cancelled notification
-      if: cancelled()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=⏹️ 编译任务已取消%0A%0A❌ 工作流被手动取消%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-        -d "disable_web_page_preview=true"
