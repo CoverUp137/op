@@ -39,6 +39,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
 
+    - name: Send start notification to Telegram
+      if: always()
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: leike-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 仓库: ${{ github.repository }}%0A🔄 分支: ${{ github.ref }}%0A%0A⏳ 编译进行中..." \
+        -d "disable_web_page_preview=true"
+
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -94,6 +102,14 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
+    - name: Send download complete notification
+      if: always() && steps.package.outcome == 'success'
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+        -d "text=📥 软件包下载完成%0A%0A✅ 所有依赖包已就绪%0A⏳ 开始编译固件..." \
+        -d "disable_web_page_preview=true"
+
     - name: Compile the firmware
       id: compile
       run: |
@@ -104,6 +120,22 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+
+    - name: Send compile success notification
+      if: steps.compile.outputs.status == 'success'
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+        -d "text=✅ 固件编译成功%0A%0A📦 设备: ${{ env.DEVICE_NAME }}%0A📅 时间: ${{ env.FILE_DATE }}%0A%0A📤 正在上传文件..." \
+        -d "disable_web_page_preview=true"
+
+    - name: Send compile failure notification
+      if: steps.compile.outputs.status != 'success' && failure()
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+        -d "text=❌ 固件编译失败%0A%0A⚠️ 请检查编译日志%0A🔍 查看错误信息%0A%0A📎 工作流: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+        -d "disable_web_page_preview=true"
 
     - name: Check space usage
       if: (!cancelled())
@@ -150,4 +182,21 @@ jobs:
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
 
-    
+    - name: Send final success notification
+      if: steps.tag.outputs.status == 'success'
+      run: |
+        RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.release_tag }}"
+        ARTIFACT_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+        -d "text=🎉 OpenWrt 编译完成%0A%0A✅ 所有步骤已完成%0A📦 设备: ${{ env.DEVICE_NAME }}%0A🏷️ 版本: ${{ steps.tag.outputs.release_tag }}%0A%0A🔗 下载地址:%0A• Releases: $RELEASE_URL%0A• Artifacts: $ARTIFACT_URL%0A%0A⏱️ 编译时间: $(date +'%Y-%m-%d %H:%M:%S')" \
+        -d "disable_web_page_preview=true"
+
+    - name: Send workflow cancelled notification
+      if: cancelled()
+      run: |
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+        -d "text=⏹️ 编译任务已取消%0A%0A❌ 工作流被手动取消%0A📎 详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+        -d "disable_web_page_preview=true"
