@@ -1,4 +1,4 @@
-name: leike-n60pro
+name: netcore-n60pro
 
 on:
   repository_dispatch:
