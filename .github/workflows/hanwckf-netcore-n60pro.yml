@@ -167,7 +167,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-${{ env.REPO_BRANCH }}-n60pro"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-${{ env.REPO_BRANCH }}-hanwckf-5.4-n60pro"
         touch release.txt
         echo "::set-output name=status::success"
 
