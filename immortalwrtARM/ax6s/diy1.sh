@@ -27,4 +27,3 @@
 
 
 
-git clone https://github.com/bricco1981/MT7622-mtkwifi.git package/MT7622-mtkwifi
