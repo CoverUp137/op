@@ -3,66 +3,99 @@ name: hanwckf-netcore-n60pro
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
 
 env:
   REPO_URL: https://github.com/CoverUp137/immortalwrt-mt798x.git
   REPO_BRANCH: openwrt-21.02
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: hanwckf-n60pro.config
+  CONFIG_FILE: lhanwckf-n60pro.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: true
+  UPLOAD_COWTRANSFER: false
+  UPLOAD_WETRANSFER: false
+  UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
+    - name: Before freeing up disk space
+      run: |
+        echo "Before freeing up disk space"
+        echo "=============================================================================="
+        df -hT
+        echo "=============================================================================="
+
+    - name: "Optimize Disk Space"
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.1"
+      with:
+        operate_sudo: "True"
+        general_include: ".+"
+        general_exclude: |-
+          ^GCC$
+          ^G\+\+$
+          Clang
+          LLVM
+        docker_include: ".+"
+        docker_prune: "True"
+        docker_clean: "True"
+        apt_prune: "True"
+        apt_clean: "True"
+        homebrew_prune: "True"
+        homebrew_clean: "True"
+        npm_prune: "True"
+        npm_clean: "True"
+        os_swap: "True"
+
+    - name: Freeing up disk space
+      uses: easimon/maximize-build-space@master
+      with: 
+        root-reserve-mb: 3072
+        swap-size-mb: 1
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+
+    - name: Free up disk space complete
+      run: |
+        echo "Free up disk space complete"
+        echo "=============================================================================="
+        df -hT
+        echo "=============================================================================="
+
     - name: Checkout
       uses: actions/checkout@main
-
-    - name: Send start notification to Telegram
-      if: always()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🚀 OpenWrt 编译开始%0A%0A📱 项目: hanwckf-5.4-netcore-n60pro%0A🔰 触发: ${{ github.event_name }}%0A📅 时间: $(date +'%Y-%m-%d %H:%M:%S')%0A🌐 源码仓库: ${{ env.REPO_URL }}%0A🔄 源码分支: ${{ env.REPO_BRANCH }}%0A%0A⏳ 编译进行中..." \
-        -d "disable_web_page_preview=true"
 
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.eu.org/init_build_environment.sh)'
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq full-upgrade
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+        bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
+        genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev \
+        libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
+        libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf \
+        python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
+        swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/local/lib/android /opt/ghc /usr/share/dotnet /usr/local/graalvm /usr/local/.ghcup \
+        /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/node_modules
         sudo timedatectl set-timezone "$TZ"
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
+        sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
 
     - name: Clone source code
-      id: clone
-      working-directory: /workdir
+      working-directory: ./
       run: |
-        df -hT $PWD
-        echo "正在克隆源码仓库..."
-        echo "仓库地址: ${{ env.REPO_URL }}"
-        echo "分支: ${{ env.REPO_BRANCH }}"
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
-        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        # 记录实际使用的源码信息
-        cd openwrt
-        echo "源码版本信息:"
-        git log -1 --oneline
-        echo "::set-output name=source_commit::$(git rev-parse --short HEAD)"
+        git clone --depth=1 $REPO_URL -b $REPO_BRANCH openwrt
 
     - name: Load custom feeds
       run: |
@@ -85,56 +118,26 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
-    - name: SSH connection to Actions
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-
     - name: Download package
       id: package
       run: |
         cd openwrt
         make defconfig
-        make download -j8
+        make download -j$(($(nproc) * 3 / 2))
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-
-    - name: Send download complete notification
-      if: always() && steps.package.outcome == 'success'
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=📥 软件包下载完成%0A%0A✅ 所有依赖包已就绪%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A⏳ 开始编译固件..." \
-        -d "disable_web_page_preview=true"
 
     - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
-        echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "::set-output name=status::success"
+        echo -e "CPU $(nproc) thread"
+        echo -e "$(($(nproc) * 3 / 2)) thread compile"
+        make -j$(($(nproc) * 3 / 2)) || make -j1 || make -j1 V=s
+        echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-
-    - name: Send compile success notification
-      if: steps.compile.outputs.status == 'success'
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=✅ 固件编译成功%0A%0A📦 设备: ${{ env.DEVICE_NAME }}%0A📅 时间: ${{ env.FILE_DATE }}%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A%0A📤 正在上传文件..." \
-        -d "disable_web_page_preview=true"
-
-    - name: Send compile failure notification
-      if: steps.compile.outputs.status != 'success' && failure()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=❌ 固件编译失败%0A%0A⚠️ 请检查编译日志%0A🔍 查看错误信息%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A%0A📎 工作流: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-        -d "disable_web_page_preview=true"
 
     - name: Check space usage
       if: (!cancelled())
@@ -154,7 +157,7 @@ jobs:
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
+        echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
@@ -167,9 +170,11 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-${{ env.REPO_BRANCH }}-hanwckf-5.4-n60pro"
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-hanwckf-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
         touch release.txt
-        echo "::set-output name=status::success"
+   #     [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
+   #     [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
@@ -180,22 +185,3 @@ jobs:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
-
-    - name: Send final success notification
-      if: steps.tag.outputs.status == 'success'
-      run: |
-        RELEASE_URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.release_tag }}"
-        ARTIFACT_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=🎉 OpenWrt 编译完成%0A%0A✅ 所有步骤已完成%0A📦 设备: ${{ env.DEVICE_NAME }}%0A🏷️ 版本: ${{ steps.tag.outputs.release_tag }}%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 提交: ${{ steps.clone.outputs.source_commit }}%0A%0A🔗 下载地址:%0A• Releases: $RELEASE_URL%0A• Artifacts: $ARTIFACT_URL%0A%0A⏱️ 编译时间: $(date +'%Y-%m-%d %H:%M:%S')" \
-        -d "disable_web_page_preview=true"
-
-    - name: Send workflow cancelled notification
-      if: cancelled()
-      run: |
-        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-        -d "text=⏹️ 编译任务已取消%0A%0A❌ 工作流被手动取消%0A🌐 源码分支: ${{ env.REPO_BRANCH }}%0A📎 详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-        -d "disable_web_page_preview=true"
