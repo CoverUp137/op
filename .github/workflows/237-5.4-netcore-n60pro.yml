@@ -8,7 +8,7 @@ env:
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
   REPO_BRANCH: 2410
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 5.4-power-n60pro.config
+  CONFIG_FILE: 237/5.4-power-n60pro.config
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
