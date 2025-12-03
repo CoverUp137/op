@@ -3,4 +3,4 @@
 git clone https://github.com/sirpdboy/luci-app-timecontrol package/luci-app-timecontrol
 
 # 一键分区
- git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
+git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
