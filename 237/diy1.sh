@@ -6,5 +6,5 @@ git clone https://github.com/sirpdboy/luci-app-timecontrol package/luci-app-time
 git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
 
 # 实时监控
-rm -rf /package/feeds/luci/luci-app-netdata
+rm -rf package/feeds/luci/luci-app-netdata
 git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
