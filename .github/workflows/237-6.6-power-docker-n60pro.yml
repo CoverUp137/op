@@ -1,4 +1,4 @@
-name: 237-6.6-power-docker-netcore-n60pro
+name: 237-6.6-power-docker-n60pro
 
 on:
   repository_dispatch:
