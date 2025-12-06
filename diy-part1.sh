@@ -20,4 +20,4 @@
 #echo 'src-git istore https://github.com/linkease/istore;main' >> feeds.conf.default
 #git clone https://github.com/bricco1981/MT7622-mtkwifi.git package/MT7622-mtkwifi
 
-git clone https://github.com/linkease/istore package/istore
+#git clone https://github.com/linkease/istore package/istore
