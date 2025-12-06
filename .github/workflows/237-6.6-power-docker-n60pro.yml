@@ -3,6 +3,9 @@ name: 237-6.6-power-docker-n60pro
 on:
   repository_dispatch:
   workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * 3'
+  
 
 env:
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
