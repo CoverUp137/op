@@ -4,8 +4,7 @@ on:
   repository_dispatch:
   workflow_dispatch:
   schedule:
-   - cron: '05 10 * * 1'
-  
+    - cron: '05 10 * * 1'
 
 env:
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
