@@ -1,7 +1,6 @@
 name: 237-6.6-power-docker-n60pro
 
 on:
-
   schedule:
     - cron: 0 20 * * 0
   repository_dispatch:
