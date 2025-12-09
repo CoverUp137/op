@@ -13,3 +13,6 @@ git clone https://github.com/sirpdboy/luci-app-taskplan package/luci-app-taskpla
 
 # luci-app-wizard
 git clone https://github.com/sirpdboy/luci-app-wizard package/luci-app-wizard
+
+# 看门狗
+git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
