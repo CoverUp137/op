@@ -12,7 +12,7 @@ git clone https://github.com/linkease/istore package/istore
 git clone https://github.com/sirpdboy/luci-app-taskplan package/luci-app-taskplan
 
 # luci-app-wizard
-git clone https://github.com/sirpdboy/luci-app-wizard package/luci-app-wizard
+git clone https://github.com/sirpdboy/luci-app-netwizard.git package/luci-app-netwizard
 
 # 看门狗
 git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
