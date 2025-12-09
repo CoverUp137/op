@@ -10,3 +10,6 @@ git clone https://github.com/linkease/istore package/istore
 
 # 任务设置taskplan
 git clone https://github.com/sirpdboy/luci-app-taskplan package/luci-app-taskplan
+
+# luci-app-wizard
+git clone https://github.com/sirpdboy/luci-app-wizard package/luci-app-wizard
