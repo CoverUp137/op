@@ -15,4 +15,4 @@ git clone https://github.com/sirpdboy/luci-app-taskplan package/luci-app-taskpla
 # git clone https://github.com/sirpdboy/luci-app-netwizard.git package/luci-app-netwizard
 
 # 看门狗
-git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
+# git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
