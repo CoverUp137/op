@@ -157,7 +157,6 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
-        rm -f mt798*.bin
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
@@ -195,7 +194,7 @@ jobs:
 
          ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-         🌐 管理地址: 192.168.2.1
+         🌐 管理地址: 192.168.2.3
 
          👤 用户名: root
 
