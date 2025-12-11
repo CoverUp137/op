@@ -170,10 +170,10 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")-237-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 237-24.10-5.4内核
-            固件不带docker，补全Docker依赖和翻墙插件的依赖，
-            可在软件包直接搜索安装，安装不上的插件请勾选 允许覆盖冲突
-            带store商店
+         🈴 固件: 237-24.10-5.4内核-高功率wifi驱动
+            1： 补全dockr依赖，软件包里直接docker
+            2： 补全USB网络驱动，可接随身WIFI
+            3： 补全魔法上网依赖，自行安装clash，nikki等
 
 
           软件源更新失败解决方法： 软件包---配置opkg--distfeeds.conf---把mt7986修改成filogic即可
