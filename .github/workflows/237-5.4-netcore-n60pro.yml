@@ -225,7 +225,7 @@ jobs:
         
     - name: Delete old tags
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      uses: dev-drprasad/delete-tag-and-release@v0.1.0
       with:
        tag_name: '*'  # 匹配所有标签
        older_than: '10'  # 删除10天前的标签
