@@ -223,14 +223,30 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         
-    - name: Delete old tags
+    - name: Delete all tags older than 10 days
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      uses: dev-drprasad/delete-tag-and-release@v3.1.0
-      with:
-       tag_name: '*'  # 匹配所有标签
-       older_than: '10'  # 删除10天前的标签
-       keep_latest: 0    # 不保留任何最新标签（确保older_than生效）
-       skip_tags: ''     # 不跳过任何标签
-       delete_release: false  # 重要：只删除标签，不删除Release
       env:
-       GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        GH_TOKEN: ${{ secrets.TOKEN }}
+        run: |
+         echo "=== 删除超过10天的所有标签 ==="
+    
+         # 计算10天前的时间
+         CUTOFF=$(date -d "10 days ago" --utc --iso-8601=seconds)
+         echo "删除时间点: $CUTOFF"
+    
+         # 获取并处理所有标签
+         gh api --paginate "repos/${{ github.repository }}/tags" \
+         --jq '.[] | "\(.name) \(.commit.sha)"' | while read TAG_INFO; do
+      
+         TAG_NAME=$(echo $TAG_INFO | cut -d' ' -f1)
+         COMMIT_SHA=$(echo $TAG_INFO | cut -d' ' -f2)
+         COMMIT_DATE=$(gh api "repos/${{ github.repository }}/commits/$COMMIT_SHA" \
+          --jq '.commit.committer.date' 2>/dev/null || echo "")
+      
+         if [[ -n "$COMMIT_DATE" && "$COMMIT_DATE" < "$CUTOFF" ]]; then
+         echo "删除: $TAG_NAME ($COMMIT_DATE)"
+         gh api -X DELETE "repos/${{ github.repository }}/git/refs/tags/$TAG_NAME" --silent
+         else
+         echo "保留: $TAG_NAME ($COMMIT_DATE)"
+         fi
+         done
