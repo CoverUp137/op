@@ -175,9 +175,10 @@ jobs:
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")-237-6.6-power-docker-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 237-24.10-6.6内核-高功率
-            固件不带docker，补全Docker依赖和翻墙插件的依赖，
-            可在软件包直接搜索安装，安装不上的插件请勾选 允许覆盖冲突
-            带store商店
+            1： 补全dockr依赖，软件包里直接docker
+            2： 补全USB网络驱动，可接随身WIFI
+            3： 补全魔法上网依赖，自行安装clash，nikki等
+            4:  增加store软件商店
          
          📝 设备: 磊科Netcore N60 Pro
          
