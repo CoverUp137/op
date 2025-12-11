@@ -174,8 +174,8 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")-237-6.6-power-docker-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 237-24.10-6.6内核-高功率
-            1： 补全dockr依赖，软件包里直接docker
+         🈴 固件: 237-24.10-6.6内核-高功率wifi
+            1： 补全docker依赖，软件包里直接装docker
             2： 补全USB网络驱动，可接随身WIFI
             3： 补全魔法上网依赖，自行安装clash，nikki等
             4:  增加istore软件商店
