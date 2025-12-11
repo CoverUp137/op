@@ -233,4 +233,4 @@ jobs:
        skip_tags: ''     # 不跳过任何标签
        delete_release: false  # 重要：只删除标签，不删除Release
       env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       GITHUB_TOKEN: ${{ secrets.TOKEN }}
