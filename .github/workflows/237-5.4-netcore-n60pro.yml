@@ -174,6 +174,8 @@ jobs:
             固件不带docker，补全Docker依赖和翻墙插件的依赖，
             可在软件包直接搜索安装，安装不上的插件请勾选 允许覆盖冲突
             带store商店
+          ![截图logs](https://raw.githubusercontent.com/你的用户名/仓库名/main/logo.png)
+
          
          📝 设备: 磊科Netcore N60 Pro
          
