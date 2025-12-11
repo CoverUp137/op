@@ -171,6 +171,9 @@ jobs:
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")-237-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 237-24.10-5.4内核
+            固件不带docker，补全Docker依赖和翻墙插件的依赖，
+            可在软件包直接搜索安装，安装不上的插件请勾选 允许覆盖冲突
+            带store商店
          
          📝 设备: 磊科Netcore N60 Pro
          
