@@ -175,11 +175,6 @@ jobs:
         echo "
          🈴 固件: 京东云亚瑟AX1800PRO-6.12内核-带nss满血驱动
          
-            1： 补全docker依赖，软件包里直接装docker
-            2： 补全USB网络驱动，可接随身WIFI
-            3： 补全魔法上网依赖，自行安装clash，nikki等
-            4:  增加istore软件商店
-         
          📝 设备: 京东云亚瑟AX1800 Pro
          
          🧠 内存: 512MB
