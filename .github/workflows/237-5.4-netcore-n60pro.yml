@@ -222,3 +222,15 @@ jobs:
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        
+    - name: Delete old tags
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      with:
+       tag_name: '*'  # 匹配所有标签
+       older_than: '10'  # 删除10天前的标签
+       keep_latest: 0    # 不保留任何最新标签（确保older_than生效）
+       skip_tags: ''     # 不跳过任何标签
+       delete_release: false  # 重要：只删除标签，不删除Release
+      env:
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
