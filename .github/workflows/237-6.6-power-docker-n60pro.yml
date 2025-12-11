@@ -178,7 +178,7 @@ jobs:
             1： 补全dockr依赖，软件包里直接docker
             2： 补全USB网络驱动，可接随身WIFI
             3： 补全魔法上网依赖，自行安装clash，nikki等
-            4:  增加store软件商店
+            4:  增加istore软件商店
          
          📝 设备: 磊科Netcore N60 Pro
          
