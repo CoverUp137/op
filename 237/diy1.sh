@@ -17,4 +17,4 @@ git clone https://github.com/linkease/istore package/istore
 # 看门狗
 # git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
 
-git clone https://github.com/papagaye744/luci-theme-design.git package/luci-theme-design
+git clone https://github.com/papagaye744/luci-theme-design package/luci-theme-design
