@@ -8,8 +8,8 @@ on:
   
 
 env:
-  REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
-  REPO_BRANCH: k6.12-nss
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+  REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: jdc/ax1800pro.config
   DIY_P1_SH: jdc/diy1.sh
@@ -173,7 +173,7 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")-京东云亚瑟AX1800PRO" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 京东云亚瑟AX1800PRO-6.12内核-带nss满血驱动
+         🈴 固件: 京东云亚瑟AX1800PRO-LEDE
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
