@@ -5,8 +5,6 @@
 # 一键分区
 # git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
 
-#store商店
-git clone https://github.com/linkease/istore package/istore
 
 # 任务设置taskplan
 # git clone https://github.com/sirpdboy/luci-app-taskplan package/luci-app-taskplan
@@ -17,4 +15,9 @@ git clone https://github.com/linkease/istore package/istore
 # 看门狗
 # git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
 
-git clone https://github.com/papagaye744/luci-theme-design package/luci-theme-design
+# git clone https://github.com/papagaye744/luci-theme-design package/luci-theme-design
+
+echo 'src-git nas https://github.com/linkease/nas-packages.git;master' >> feeds.conf.default
+echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >> feeds.conf.defaul
+#store商店
+git clone https://github.com/linkease/istore package/istore
