@@ -22,5 +22,5 @@
 #store商店
 git clone https://github.com/linkease/istore package/istore
 
-# git clone https://github.com/CoverUp137/luci-app package/istorex
-git clone https://github.com/linkease/nas-packages-luci package/istorex
+git clone https://github.com/CoverUp137/luci-app package/istorex
+# git clone https://github.com/linkease/nas-packages-luci package/istorex
