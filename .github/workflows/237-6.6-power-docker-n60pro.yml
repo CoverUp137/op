@@ -14,7 +14,7 @@ env:
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
   REPO_BRANCH: openwrt-24.10-6.6
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 237/istorex6.config
+  CONFIG_FILE: 237/6.6.config
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -179,9 +179,9 @@ jobs:
         echo "
          🈴 固件: 237-24.10-6.6内核-高功率wifi
          
-            1： 补全docker依赖，软件包里直接装docker
-            2： 补全USB网络驱动，可接随身WIFI
-            3： 补全魔法上网依赖，自行安装clash，nikki等
+            1： 补全docker依赖
+            2： 补全USB网络驱动
+            3： 补全魔法上网依赖
             4:  增加istore软件商店
          
          📝 设备: 磊科Netcore N60 Pro
