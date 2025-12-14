@@ -1,8 +1,8 @@
 name: JDC-AX1800 PRO
 
 on:
-  schedule:
-    - cron: 0 10 * * 0
+#  schedule:
+#    - cron: 0 10 * * 0
   repository_dispatch:
   workflow_dispatch:
   
