@@ -177,7 +177,7 @@ jobs:
          🈴 固件: x86-6.6
          
             1: 新版istore界面
-            2: 添加lucky,openclash,nikki，istore商店
+            2: 添加lucky,openclash,nikki，istore商店,微信推送plus
             3: 补全docker依赖
             4: 补全usb网络连接
 
