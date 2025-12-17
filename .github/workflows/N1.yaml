@@ -1,258 +1,232 @@
-#
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-#
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# Description: Build OpenWrt using GitHub Actions
-#
-
-
-name: 编译固件（LEDE）
+name: N1
 
 on:
   repository_dispatch:
   workflow_dispatch:
-
- # schedule:
- #   - cron: 0 16 * * 4
-
+  
+  schedule:
+   - cron: 0 11 * * 4
+  
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
-  FEEDS_CONF: N1/feeds.conf.default
-  CONFIG_FILE: N1/.config-lede
-  DIY_P1_SH: N1/diy1.sh
-  DIY_P2_SH: N1/diy2.sh
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
+  REPO_BRANCH: 2410
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: 237/5.4.config
+  DIY_P1_SH: 237/diy1.sh
+  DIY_P2_SH: 237/diy2.sh
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
-  DATE: ${{ github.run_number }}
-
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
-    env:
-      WHOAMI: ${{ github.actor }}
-      PACKAGE_SOC: s905d
-
+    runs-on: ubuntu-latest
 
     steps:
-    - name: 创建编译空间挂载点
+    - name: Before freeing up disk space
       run: |
-        sudo mkdir -p /workdir
-        sudo chown $USER:$USER /workdir
+        echo "Before freeing up disk space"
+        echo "=============================================================================="
+        df -hT
+        echo "=============================================================================="
 
-
-    - name: 最大化编译空间
-      uses: easimon/maximize-build-space@master
+    - name: "Optimize Disk Space"
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.1"
       with:
-        root-reserve-mb: 4096
-        swap-size-mb: 1024
-        temp-reserve-mb: 200
-        build-mount-path: /workdir
-        overprovision-lvm: 'true'
+        operate_sudo: "True"
+        general_include: ".+"
+        general_exclude: |-
+          ^GCC$
+          ^G\+\+$
+          Clang
+          LLVM
+        docker_include: ".+"
+        docker_prune: "True"
+        docker_clean: "True"
+        apt_prune: "True"
+        apt_clean: "True"
+        homebrew_prune: "True"
+        homebrew_clean: "True"
+        npm_prune: "True"
+        npm_clean: "True"
+        os_swap: "True"
+
+    - name: Freeing up disk space
+      uses: easimon/maximize-build-space@master
+      with: 
+        root-reserve-mb: 3072
+        swap-size-mb: 1
         remove-dotnet: 'true'
         remove-android: 'true'
         remove-haskell: 'true'
         remove-codeql: 'true'
         remove-docker-images: 'true'
 
-  
-    - name: 检出代码
-      uses: actions/checkout@v4
-
-
-    - name: 检查服务器配置
+    - name: Free up disk space complete
       run: |
-        echo "警告⚠"
-        echo "分配的服务器性能有限，若选择的插件过多，务必注意CPU性能！"
-        echo "云编译建议取消勾选Node.js及其相关插件！"
-        echo "已知CPU型号（降序）：8370C,8272CL,8171M,E5系列"
-        echo "--------------------------CPU信息--------------------------"
-        echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
-        echo -e "CPU核心及版本信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-        echo "--------------------------内存信息--------------------------"
-        echo "已安装内存详细信息："
-        sudo lshw -short -C memory | grep GiB
-        echo -e "\n"
-        echo "--------------------------硬盘信息--------------------------"
-        echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
-        echo "硬盘详情："
-        df -Th
+        echo "Free up disk space complete"
+        echo "=============================================================================="
+        df -hT
+        echo "=============================================================================="
 
+    - name: Checkout
+      uses: actions/checkout@main
 
-    - name: 初始化编译环境
+    - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo apt-get update -y
-        sudo apt-get full-upgrade -y
-        sudo apt-get install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
-        bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
-        git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
-        libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
-        mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
-        libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
-        vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq full-upgrade
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+        bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
+        genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev \
+        libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
+        libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf \
+        python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
+        swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/local/lib/android /opt/ghc /usr/share/dotnet /usr/local/graalvm /usr/local/.ghcup \
+        /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/node_modules
         sudo timedatectl set-timezone "$TZ"
-        echo "硬盘详情："
-        df -Th
-  
+        sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
 
-    - name: 克隆源码
-      working-directory: /workdir
+    - name: Clone source code
+      working-directory: ./
       run: |
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
-        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        git clone --depth=1 $REPO_URL -b $REPO_BRANCH openwrt
 
-
-    - name: 加载自定义feeds
-      working-directory: /workdir/openwrt
+    - name: Load custom feeds
       run: |
-        [ -f "$GITHUB_WORKSPACE/LEDE/feeds.conf.default" ] && \
-          cp "$GITHUB_WORKSPACE/LEDE/feeds.conf.default" feeds.conf.default
-        chmod +x "$GITHUB_WORKSPACE/diy-part1.sh"
-        "$GITHUB_WORKSPACE/diy-part1.sh"
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
 
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+      
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
 
-    - name: 更新feeds
-      run: cd /workdir/openwrt && ./scripts/feeds update -a
-
-    
-    - name: 安装feeds
-      run: cd /workdir/openwrt && ./scripts/feeds install -a
-
-
-    - name: 加载自定义配置
+    - name: Load custom configuration
       run: |
-        [ -d "$GITHUB_WORKSPACE/files" ] && cp -r "$GITHUB_WORKSPACE/files" /workdir/openwrt/
-        [ -f "$GITHUB_WORKSPACE/LEDE/.config-lede" ] && cp "$GITHUB_WORKSPACE/LEDE/.config-lede" /workdir/openwrt/.config
-        chmod +x "$GITHUB_WORKSPACE/LEDE/diy-part2.sh"
-        cd /workdir/openwrt
-        "$GITHUB_WORKSPACE/LEDE/diy-part2.sh"
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_P2_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P2_SH
 
-
-    - name: 下载软件包
+    - name: Download package
+      id: package
       run: |
-        cd /workdir/openwrt
+        cd openwrt
         make defconfig
-        make download -j8
+        make download -j$(($(nproc) * 3 / 2))
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-        echo "硬盘详情："
-        df -Th
 
-
-    - name: 编译固件
+    - name: Compile the firmware
+      id: compile
       run: |
-        cd /workdir/openwrt
-        echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
+        cd openwrt
+        echo -e "CPU $(nproc) thread"
+        echo -e "$(($(nproc) * 3 / 2)) thread compile"
+        make -j$(($(nproc) * 3 / 2)) || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-
-    - name: 清理磁盘空间
-      if: (!cancelled())
-      run: |
-        echo "清理之前："
-        df -hT
-        mkdir openwrt-armvirt
-        mkdir -p /workdir/upload
-        # 使用绝对路径操作，避免软链接解析问题
-        cp /workdir/openwrt/bin/targets/*/*/*.tar.gz /workdir/upload/
-        mv /workdir/openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
-        echo -e "\n"
-        echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir | sort -nr | head -10
-        rm -rf /workdir/openwrt/ && sync
-        echo -e "\n"
-        echo "清理之后："
-        df -hT
-        echo -e "\n"
-        echo "/workdir路径文件"
-        ls -l /workdir/
-        echo -e "\n"
-        echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir | sort -nr | head -10
-
-
-    - name: 打包内核
-      uses: ophub/flippy-openwrt-actions@main
+    
+    - name: Package OpenWrt Firmware
+      uses: unifreq/openwrt_packit@master
       env:
-        WHOAMI: ${{ env.WHOAMI }}
-        PACKAGE_SOC: ${{ env.PACKAGE_SOC }}
-        OPENWRT_ARMVIRT: openwrt-armvirt/*.tar.gz
-        KERNEL_VERSION_NAME: 5.15.105_6.6.1
-       # KERNEL_AUTO_LATEST: false
-       # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
-        
+       OPENWRT_ARMSR: openwrt/bin/targets/*/*/*rootfs.tar.gz
+       PACKAGE_SOC: all
+       KERNEL_VERSION_NAME: 6.1.y_6.12.y
+       OPENWRT_IP: 192.168.1.1
+    
+    - name: Check space usage
+      if: (!cancelled())
+      run: df -hT
 
-    - name: 整理文件
+    - name: Upload bin directory
+      uses: actions/upload-artifact@main
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/bin
+
+    - name: Organize files
+      id: organize
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        mkdir -p /workdir/upload
-        src_path="/opt/openwrt_packit/output"
-        if [ ! -d "$src_path" ] || [ -z "$(ls -A "$src_path" 2>/dev/null)" ]; then
-          ls -lR /opt/openwrt_packit/ || true
-          exit 1
-        fi
-        cp -r "$src_path"/* /workdir/upload/
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
 
-    
-    - name: 发布固件
-      uses: ncipollo/release-action@v1
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@main
+      if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        tag: openwrt_armvirt_v8_${{ env.FILE_DATE }}
-        artifacts: /workdir/upload/*
-        allowUpdates: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        body: |
-          # 🚀 OpenWrt固件发布 - N1盒子专用
-          
-          ## 📋 固件信息
-          - **默认IP地址**: `192.168.1.10`
-          - **默认用户名**: `root`
-          - **默认密码**: `password`
-          - **适用平台**: Amlogic S905D (N1盒子)
-          
-          ## 🛠️ 安装与更新
-          **U盘安装**: 写入U盘启动 → 执行 `openwrt-install-amlogic` → 按提示完成eMMC写入
-          
-          **Web界面**: 登录Luci → 使用"晶晨宝盒"插件 → 一键安装/更新
-          
-          **固件更新**: 将固件放入 `/mnt/mmcblk2p4/` → 执行 `openwrt-update-amlogic`
-          
-          ## ✨ 功能特色
-          ✅ 集成常用插件 | ✅ 一键eMMC安装 | ✅ 在线更新 | ✅ N1性能优化
-          
-          ## ⚠️ 重要提示
-          - 固件文件名：`openwrt_s905d_n1_XX_XX`
-          - 确保N1盒子型号匹配，建议首次使用前备份原系统
+        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
 
+    - name: Generate release tag
+      id: tag
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-N1" >> $GITHUB_OUTPUT
+        echo "
+         
+         📝 设备: 斐讯N1
+         
+         💻 架构: S905D
 
+         📂 源码: $REPO_URL
 
-    - name: 清理Actions空间
-      uses: Mattraks/delete-workflow-runs@main
+         🌳 分支: $REPO_BRANCH
+
+         ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
+
+         🌐 管理地址: 192.168.2.1
+
+         👤 用户名: root
+
+         🔒 密码: password" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: Upload OpenWrt Firmware to Release
+      uses: ncipollo/release-action@main
       with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          keep_minimum_runs: 0
-          retain_days: 7
-          #retain_days: ${{ github.event.inputs.action_days }}
-    
-          
-    - name: 删除多余releases
-      uses: dev-drprasad/delete-older-releases@master
+       tag: openwrt_armsr-armv8_${{ env.PACKAGED_OUTPUTDATE }}
+       artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+       allowUpdates: true
+       token: ${{ secrets.TOKEN }}
+       body: |
+        This is OpenWrt firmware for Armv8
+        * Firmware information
+        Default IP: 192.168.1.1
+        Default username: root
+        Default password: password
+
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@v2
       with:
-        repo: ${{ github.repository }}
-        keep_latest: 6
-        #keep_latest: ${{ github.event.inputs.rele }}
+        retain_days: 5
+        keep_minimum_runs: 5
+
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.1.0
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 10
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        
