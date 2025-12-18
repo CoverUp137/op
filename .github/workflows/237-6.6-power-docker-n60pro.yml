@@ -18,7 +18,7 @@ env:
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
@@ -232,18 +232,9 @@ jobs:
         
     - name: Send Telegram notification
       if: always()
-      run: |
-       TOKEN="${{ secrets.TELEGRAM_TOKEN }}"
-       CHAT_ID="${{ secrets.TELEGRAM_TO }}"
-       STATUS="${{ job.status }}"
-       WORKFLOW="${{ github.workflow }}"
-    
-       if [ "$STATUS" = "success" ]; then
-       MESSAGE="✅ [$WORKFLOW] 编译成功"
-       else
-       MESSAGE="❌ [$WORKFLOW] 编译失败"
-       fi
-    
-       curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
-       -d chat_id="${CHAT_ID}" \
-       -d text="${MESSAGE}"
+      uses: appleboy/telegram-action@master
+      with:
+       to: ${{ secrets.TELEGRAM_TO }}
+       token: ${{ secrets.TELEGRAM_TOKEN }}
+       message: |
+        ${{ job.status == 'success' && '✅' || '❌' }} [${{ github.workflow }}] 编译${{ job.status == 'success' && '成功' || '失败' }}
