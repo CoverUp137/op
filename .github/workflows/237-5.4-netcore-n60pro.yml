@@ -16,7 +16,7 @@ env:
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
@@ -227,17 +227,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         
-    - name: Send Telegram notification
-      if: always()
-      uses: appleboy/telegram-action@master
-      with:
-       to: ${{ secrets.TELEGRAM_TO }}
-       token: ${{ secrets.TELEGRAM_TOKEN }}
-       message: |
-        [${{ github.workflow }}] OpenWrt 编译 ${{ job.status == 'success' && '✅ 成功' || '❌ 失败' }}
-      
-        时间: $(date +"%Y-%m-%d %H:%M")
-      
-        链接: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-        
+    
