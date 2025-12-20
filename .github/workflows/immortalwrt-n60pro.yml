@@ -172,6 +172,12 @@ jobs:
         echo "
          🈴 固件: immortalwrt原版-24.10-6.6内核
          
+            1： 补全docker依赖
+            2： 补全USB网络驱动
+            3： 补全魔法上网依赖
+            4:  增加istore软件商店
+            5:  全新istore 界面
+         
          📝 设备: 磊科Netcore N60 Pro
          
          💻 架构: MediaTek MT7986A (Filogic 830)
