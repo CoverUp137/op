@@ -219,3 +219,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
         
+         curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+         -d chat_id="${CHAT_ID}" \
+         -d text="${MESSAGE}"
