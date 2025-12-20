@@ -7,7 +7,8 @@
 
 
 # X86设备:
-- 1: immortalwrt源码
+- 1: immortalwrt源码，6.6内核
+
 
 
 
