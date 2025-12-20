@@ -176,9 +176,9 @@ jobs:
         echo "
          🈴 固件: 237-24.10-5.4内核-高功率wifi驱动
          
-            1： 补全docker依赖，软件包里直接装docker
-            2： 补全USB网络驱动，可接随身WIFI
-            3： 补全魔法上网依赖，自行安装clash，nikki，passwall等
+            1： 补全docker依赖
+            2： 补全USB网络驱动
+            3： 补全魔法上网依赖
             4:  增加istore软件商店
 
           软件源更新失败解决方法： 软件包---配置opkg--distfeeds.conf---把mt7986修改成filogic即可
@@ -186,6 +186,10 @@ jobs:
 
          
          📝 设备: 磊科Netcore N60 Pro
+         
+         🧠 内存: 512MB/2GB
+         
+         💾 存储: 128MB
          
          💻 架构: MediaTek MT7986A (Filogic 830)
 
@@ -199,7 +203,7 @@ jobs:
 
          👤 用户名: root
 
-         🔒 密码: password" >> release.txt
+         🔒 密码: password (或空密码)" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
