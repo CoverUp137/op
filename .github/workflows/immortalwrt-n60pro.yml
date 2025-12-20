@@ -170,7 +170,7 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H%M")-immortalwrt-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: immortalwrt-24.10-6.6内核
+         🈴 固件: immortalwrt原版-24.10-6.6内核
          
          📝 设备: 磊科Netcore N60 Pro
          
@@ -182,11 +182,11 @@ jobs:
 
          ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-         🌐 管理地址: 192.168.2.1
+         🌐 管理地址: 192.168.2.1或1952.168.100.1
 
          👤 用户名: root
 
-         🔒 密码: password" >> release.txt
+         🔒 密码: password [或空密码]" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
