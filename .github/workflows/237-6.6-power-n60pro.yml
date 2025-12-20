@@ -1,4 +1,4 @@
-name: 237-6.6-power-netcore-n60pro
+name: immortalwrt-netcore-n60pro
 
 on:
   repository_dispatch:
@@ -8,7 +8,7 @@ env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
   REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 237/6.6-power-n60pro.config
+  CONFIG_FILE: 237/imm.config
   DIY_P1_SH: 237/diy3.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -168,9 +168,9 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-237-6.6-power-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-immortalwrt-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 237-24.10-6.6内核-高功率
+         🈴 固件: immortalwrt-24.10-6.6内核
          
          📝 设备: 磊科Netcore N60 Pro
          
@@ -182,7 +182,7 @@ jobs:
 
          ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-         🌐 管理地址: 192.168.2.3
+         🌐 管理地址: 192.168.2.1
 
          👤 用户名: root
 
