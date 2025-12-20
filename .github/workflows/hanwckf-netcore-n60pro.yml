@@ -10,7 +10,7 @@ env:
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: 237/han.config
   DIY_P1_SH: 237/diy3.sh
-  DIY_P2_SH: 337/diy2.sh
+  DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
