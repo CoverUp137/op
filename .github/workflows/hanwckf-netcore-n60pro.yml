@@ -5,12 +5,12 @@ on:
   workflow_dispatch:
 
 env:
-  REPO_URL: https://github.com/CoverUp137/immortalwrt-mt798x.git
-  REPO_BRANCH: openwrt-21.02
+  REPO_URL: https://github.com/tuzhis/immortalwrt-mt798x.git
+  REPO_BRANCH: feature/n60
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: hanwckf-n60pro.config
-  DIY_P1_SH: diy-part1.sh
-  DIY_P2_SH: diy-part2.sh
+  CONFIG_FILE: 237/han.config
+  DIY_P1_SH: 237/diy3.sh
+  DIY_P2_SH: 337/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -182,7 +182,7 @@ jobs:
 
          ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-         🌐 管理地址: 192.168.2.3
+         🌐 管理地址: 192.168.2.1
 
          👤 用户名: root
 
