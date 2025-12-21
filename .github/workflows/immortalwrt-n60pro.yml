@@ -4,6 +4,9 @@ on:
   repository_dispatch:
   workflow_dispatch:
 
+  schedule:
+   - cron: 0 20 * * 3
+
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
   REPO_BRANCH: openwrt-24.10
