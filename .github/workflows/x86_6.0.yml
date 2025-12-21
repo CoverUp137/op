@@ -1,95 +1,118 @@
-name: openwrt-builder
+name: 2-237-5.4-power-netcore-n60pro
 
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
+  
 #  schedule:
-#   - cron: 0 1 1/7 * *
+#   - cron: 0 11 * * 4
+  
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede.git
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
+  REPO_BRANCH: 2410
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 6.0/x86/999.config
-  DIY_P1_SH: 6.0/x86/diy1.sh
-  DIY_P2_SH: 6.0/x86/diy2.sh
-  UPLOAD_BIN_DIR: true
+  CONFIG_FILE: 237/5.4.config
+  DIY_P1_SH: 237/diy1.sh
+  DIY_P2_SH: 237/diy2.sh
+  UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
-  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-    - name: 准备完成
+    - name: Before freeing up disk space
+      run: |
+        echo "Before freeing up disk space"
+        echo "=============================================================================="
+        df -hT
+        echo "=============================================================================="
+
+    - name: "Optimize Disk Space"
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.1"
+      with:
+        operate_sudo: "True"
+        general_include: ".+"
+        general_exclude: |-
+          ^GCC$
+          ^G\+\+$
+          Clang
+          LLVM
+        docker_include: ".+"
+        docker_prune: "True"
+        docker_clean: "True"
+        apt_prune: "True"
+        apt_clean: "True"
+        homebrew_prune: "True"
+        homebrew_clean: "True"
+        npm_prune: "True"
+        npm_clean: "True"
+        os_swap: "True"
+
+    - name: Freeing up disk space
+      uses: easimon/maximize-build-space@master
+      with: 
+        root-reserve-mb: 3072
+        swap-size-mb: 1
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+
+    - name: Free up disk space complete
+      run: |
+        echo "Free up disk space complete"
+        echo "=============================================================================="
+        df -hT
+        echo "=============================================================================="
+
+    - name: Checkout
       uses: actions/checkout@main
 
-    - name: 检查服务器配置
-      run: |
-        echo "若分配的服务器性能不足，务必及时取消，重新运行！"
-        echo -e "------------------------------- CPU信息 -------------------------------\n"
-        echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
-        echo -e "CPU核心及版本信息: $(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-        echo -e "------------------------------- 内存信息 -------------------------------\n"
-        echo "已安装内存详细信息: "
-        sudo lshw -short -C memory | grep GiB
-        echo -e "\n"
-        echo -e "------------------------------- 磁盘信息 -------------------------------\n"
-        echo -e "磁盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
-        echo "------------------------------- 磁盘详情 -------------------------------\n"
-        df -Th
-
-    - name: 安装 Go 
-      uses: actions/setup-go@v5
-      with:
-        go-version: 'stable'
-
-    - name: 初始化编译环境
+    - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-        sudo docker image prune --all --force
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev rename
-        #sudo -E bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
+        sudo -E apt-get -qq full-upgrade
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+        bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
+        genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev \
+        libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
+        libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf \
+        python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
+        swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/local/lib/android /opt/ghc /usr/share/dotnet /usr/local/graalvm /usr/local/.ghcup \
+        /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/node_modules
         sudo timedatectl set-timezone "$TZ"
-        
-    - name: 克隆源码
-      run: |
-       git clone -b $REPO_BRANCH --single-branch --filter=blob:none $REPO_URL openwrt
+        sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
 
-    - name: 缓存构建动作
-      uses: stupidloud/cachewrtbuild@main
-      with:
-        ccache: 'true'
-        mixkey: x86-64-${{ env.REPO_BRANCH }}
-        prefix: ${{ github.workspace }}/openwrt
-
-    - name: 加载自定义 feeds
+    - name: Clone source code
+      working-directory: ./
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf
+        git clone --depth=1 $REPO_URL -b $REPO_BRANCH openwrt
+
+    - name: Load custom feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
-    - name: 更新 feeds
+    - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
-
-    - name: 安装 feeds
+      
+    - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
 
-    - name: 加载自定义配置
+    - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
@@ -97,121 +120,133 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
-    - name: SSH 连接到 Actions
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-
-    - name: 下载软件包
+    - name: Download package
       id: package
       run: |
         cd openwrt
         make defconfig
-        make download -j8
+        make download -j$(($(nproc) * 3 / 2))
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: 编译固件
+    - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
-        echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        echo -e "CPU $(nproc) thread"
+        echo -e "$(($(nproc) * 3 / 2)) thread compile"
+        make -j$(($(nproc) * 3 / 2)) || make -j1 || make -j1 V=s
+        echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-        echo "status=success" >> ${GITHUB_OUTPUT}
-        
-    - name: TG推送
-      if: steps.compile.outputs.status == 'success' && !cancelled()
-      env:
-        TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-      run: |
-        MESSAGE="💻 OpenWrt 编译成功！\n\n"\
-         "📂 架构: x86-64\n"\
-         "🌳 分支: ${{ env.REPO_BRANCH }}\n"\
-         "⏱️ 编译时间: $(date +"%Y年%m月%d日 %H:%M:%S")\n"\
-         "🔗 固件下载地址: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-        curl -s -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
-        -d chat_id="${TG_CHAT_ID}" \
-        -d text="$MESSAGE" \
-        -d parse_mode="Markdown"
-        
-    - name: 检查磁盘空间
+    - name: Check space usage
       if: (!cancelled())
       run: df -hT
 
-    - name: 上传 bin 文件夹
+    - name: Upload bin directory
       uses: actions/upload-artifact@main
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    - name: 整理固件文件
+    - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "status=success" >> ${GITHUB_OUTPUT}
+        echo "status=success" >> $GITHUB_OUTPUT
 
-    - name: 上传固件目录
+    - name: Upload firmware directory
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
-    - name: 生成发布标签
+    - name: Generate release tag
       id: tag
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H.%M")" >> ${GITHUB_OUTPUT}
-        touch release.txt
+        echo "release_tag=2padavanonly-5.4-power-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
-        💻 架构: x86-64
+         🈴 固件: 237-24.10-5.4内核-高功率wifi驱动
+         
+            1： 补全docker依赖
+            2： 补全USB网络驱动
+            3： 补全魔法上网依赖
+            4:  增加istore软件商店
 
-        📂 源码: ${{ env.REPO_URL }}
+          软件源更新失败解决方法： 软件包---配置opkg--distfeeds.conf---把mt7986修改成filogic即可
+          ![截图logs](https://raw.githubusercontent.com/CoverUp137/op/main/237/1.png)
 
-        🌳 分支: ${{ env.REPO_BRANCH }}
+         
+         📝 设备: 磊科Netcore N60 Pro
+         
+         🧠 内存: 512MB/2GB
+         
+         💾 存储: 128MB
+         
+         💻 架构: MediaTek MT7986A (Filogic 830)
 
-        ⏱️ 编译时间: $(date +"%Y年%m月%d日%H时%M分")
+         📂 源码: $REPO_URL
 
-        🌐 管理地址: 192.168.2.3
+         🌳 分支: $REPO_BRANCH
 
-        👤 用户名: root
+         ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-        🔒 密码: password 
-        
-        " >> release.txt
-        echo "status=success" >> ${GITHUB_OUTPUT}
+         🌐 管理地址: 192.168.2.1
 
-    - name: 自动发布固件到 Releases
-      uses: softprops/action-gh-release@master
+         👤 用户名: root
+
+         🔒 密码: password (或空密码)" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
 
-#    - name: TG推送
-#      run: curl "https://api2.pushdeer.com/message/push?pushkey=${{ secrets.PUSHDEER_TOKEN }}&text=【Github Actions】AutoBuild-immortalwrt-x86 打包成功"
-
-    - name: 删除运行记录
-      uses: Mattraks/delete-workflow-runs@main
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@v2
       with:
-        retain_days: 1
-        keep_minimum_runs: 1
-        token: ${{ env.GITHUB_TOKEN }}
+        retain_days: 5
+        keep_minimum_runs: 5
 
-    - name: 删除自动发布的旧固件
-      uses: dev-drprasad/delete-older-releases@master
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.1.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 4
+        keep_latest: 10
         delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+        
+    - name: Send Telegram notification
+      if: always()
+      run: |
+       TOKEN="${{ secrets.TELEGRAM_TOKEN }}"
+       CHAT_ID="${{ secrets.TELEGRAM_TO }}"
+       STATUS="${{ job.status }}"
+       WORKFLOW="${{ github.workflow }}"
+    
+       if [ "$STATUS" = "success" ]; then
+       MESSAGE="✅ [$WORKFLOW] 编译成功"
+       else
+       MESSAGE="❌ [$WORKFLOW] 编译失败"
+       fi
+    
+       curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+       -d chat_id="${CHAT_ID}" \
+       -d text="${MESSAGE}"
+    
