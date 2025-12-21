@@ -172,7 +172,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-237-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=237-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 237-24.10-5.4内核-高功率wifi驱动
          
