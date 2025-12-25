@@ -8,3 +8,4 @@ echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >
 git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
 git clone https://github.com/linkease/istore.git package/istore
 git clone https://github.com/nikkinikki-org/OpenWrt-nikki.git package/nikki
+git clone https://github.com/kob/nf_deaf-openwrt.git package/kernel/nf_deaf
