@@ -3,11 +3,9 @@ name: 237-6.6-power-docker-n60pro
 on:
   repository_dispatch:
   workflow_dispatch:
-
-
-
-#  schedule:
-#   - cron: 0 20 * * 2
+  
+ # schedule:
+ #  - cron: 0 11 * * 2
   
 
 env:
@@ -110,7 +108,7 @@ jobs:
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
-
+      
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
 
@@ -159,9 +157,10 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
-        rm -rf packages
-        rm -f mt798*.bin
+        rm -rf *initramfs*.bin
+        rm -rf *.manifest
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "PACKAGES_DIR=$PWD/packages" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware directory
@@ -170,6 +169,22 @@ jobs:
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
+
+    - name: Package plugins directory
+      id: package_plugins
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      run: |
+        # 检查 packages 目录是否存在
+        if [ -d "${{ env.PACKAGES_DIR }}" ]; then
+          cd ${{ env.PACKAGES_DIR }}
+          # 创建包含所有插件的压缩包
+          tar -czf ${{ github.workspace }}/packages.tar.gz .
+          echo "PACKAGES_TAR=${{ github.workspace }}/packages.tar.gz" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+        else
+          echo "Packages directory not found!"
+          echo "status=failed" >> $GITHUB_OUTPUT
+        fi
 
     - name: Generate release tag
       id: tag
@@ -183,6 +198,7 @@ jobs:
             2： 补全USB网络驱动
             3： 补全魔法上网依赖
             4:  增加istore软件商店
+            5:  编译出来的插件和kmod依赖在底线自行查找{无需求可忽略}
          
          📝 设备: 磊科Netcore N60 Pro
          
@@ -205,6 +221,7 @@ jobs:
          🔒 密码: password (或空密码)" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
+        
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
@@ -213,7 +230,9 @@ jobs:
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
-        files: ${{ env.FIRMWARE }}/*
+        files: |
+          ${{ env.FIRMWARE }}/*
+          ${{ env.PACKAGES_TAR }}
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@v2
@@ -229,22 +248,3 @@ jobs:
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        
-    - name: Send Telegram notification
-      if: always()
-      run: |
-       TOKEN="${{ secrets.TELEGRAM_TOKEN }}"
-       CHAT_ID="${{ secrets.TELEGRAM_TO }}"
-       STATUS="${{ job.status }}"
-       WORKFLOW="${{ github.workflow }}"
-    
-       if [ "$STATUS" = "success" ]; then
-       MESSAGE="✅ [$WORKFLOW] 编译成功"
-       else
-       MESSAGE="❌ [$WORKFLOW] 编译失败"
-       fi
-    
-       curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
-       -d chat_id="${CHAT_ID}" \
-       -d text="${MESSAGE}"
-    
