@@ -160,6 +160,9 @@ jobs:
         rm -rf *initramfs*.bin
         rm -rf *.manifest
         rm -rf *bl2.bin
+        rm -rf version.buildinfo
+        rm -rf sha256sums
+        rm -rf profiles.json
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "PACKAGES_DIR=$PWD/packages" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
