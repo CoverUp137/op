@@ -159,6 +159,7 @@ jobs:
         cd openwrt/bin/targets/*/*
         rm -rf *initramfs*.bin
         rm -rf *.manifest
+        rm -rf *bl2.bin
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "PACKAGES_DIR=$PWD/packages" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
