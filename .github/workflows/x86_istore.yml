@@ -187,7 +187,10 @@ jobs:
             2: 添加lucky,openclash,nikki，istore商店,微信推送plus
             3: 补全docker依赖
             4: 补全usb网络连接
-
+            
+           - 正常情况下载squashfs-combined.img.gz安装即可
+           - PVE lxc 请下载 generic-rootfs.tar.gz
+           
          📂 源码: $REPO_URL
 
          🌳 分支: $REPO_BRANCH
