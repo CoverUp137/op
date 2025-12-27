@@ -8,9 +8,9 @@ env:
   REPO_URL: https://github.com/tuzhis/immortalwrt-mt798x.git
   REPO_BRANCH: feature/n60
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 237/han.config
-  DIY_P1_SH: 237/diy3.sh
-  DIY_P2_SH: 237/diy2.sh
+  CONFIG_FILE: han.config
+  DIY_P1_SH: diy1.sh
+  DIY_P2_SH: diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -168,9 +168,9 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-hanwckf-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=hanwckf-5.4-netcore-n60pro" >> $GITHUB_OUTPUT
          echo "
-         🈴 固件: hanwckf-21.02-5.4内核
+         🈴 固件: hanwckf-21.02-5.4内核-测试固件！！！
          
          📝 设备: 磊科Netcore N60 Pro
          
