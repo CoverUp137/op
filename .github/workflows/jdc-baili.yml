@@ -172,7 +172,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-padavanonly-5.4-power-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=JDC-padavanonly" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 京东云百里-237-6.6
 
