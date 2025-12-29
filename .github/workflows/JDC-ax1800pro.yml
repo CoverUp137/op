@@ -176,7 +176,7 @@ jobs:
          🈴 固件: 京东云亚瑟AX1800PRO-VIKINGYFY-OWRT
          
             1： 满血NSS
-            2： 增加USB网络驱动-亚信AX88179-螃蟹8150,8152驱动
+            2： 增加USB网络驱动-亚信AX88179-瑞昱8150,8152驱动
             3： 添加openclash，docker
             4： 补一些kmod的依赖
          
