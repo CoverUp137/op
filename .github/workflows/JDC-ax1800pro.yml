@@ -8,8 +8,8 @@ on:
   
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede.git
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/VIKINGYFY/immortalwrt.git
+  REPO_BRANCH: main
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: jdc/ax1800pro.config
   DIY_P1_SH: jdc/diy1.sh
@@ -171,9 +171,13 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-京东云亚瑟AX1800PRO" >> $GITHUB_OUTPUT
+        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 京东云亚瑟AX1800PRO-LEDE
+         🈴 固件: 京东云亚瑟AX1800PRO-VIKINGYFY
+            1： 满血NSS
+            2： 增加USB网络驱动-亚信AX88179-螃蟹8150,8152驱动
+            3： 添加openclash，docker
+            4： 补一些kmod的依赖
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
