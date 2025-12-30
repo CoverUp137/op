@@ -179,12 +179,11 @@ jobs:
       run: |
         echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 京东云亚瑟AX1800PRO
+         🈴 固件: 京东云亚瑟AX1800PRO-(apk软件包)
          
             1： 满血NSS
             2： 增加USB网络驱动可接随身WIFI，增加亚信AX88179，瑞昱8150,5152驱动
             3： 添加openclash，微信推送插件
-            4： 补全docker所需依赖
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
