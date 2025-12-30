@@ -171,13 +171,13 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS-OWRT" >> $GITHUB_OUTPUT
+        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 京东云亚瑟AX1800PRO-VIKINGYFY-OWRT
          
             1： 满血NSS
-            2： 增加USB网络驱动-亚信AX88179-瑞昱8150,8152驱动
-            3： 添加openclash，docker
+            2： 增加USB网络驱动-亚信AX88179
+            3： 添加openclash
             4： 补一些kmod的依赖
          
          📝 设备: 京东云亚瑟AX1800 Pro
