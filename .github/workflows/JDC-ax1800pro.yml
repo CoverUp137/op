@@ -157,6 +157,12 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
+        rm -rf *initramfs*
+        rm -rf *.manifest
+        rm -rf version.buildinfo
+        rm -rf sha256sums
+        rm -rf profiles.json
+        rm -rf feeds.buildinfo
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
@@ -173,12 +179,12 @@ jobs:
       run: |
         echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 京东云亚瑟AX1800PRO-VIKINGYFY-OWRT
+         🈴 固件: 京东云亚瑟AX1800PRO
          
             1： 满血NSS
-            2： 增加USB网络驱动-亚信AX88179
-            3： 添加openclash
-            4： 补一些kmod的依赖
+            2： 增加USB网络驱动可接随身WIFI，增加亚信AX88179，瑞昱8150,5152驱动
+            3： 添加openclash，微信推送插件
+            4： 补全docker所需依赖
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
