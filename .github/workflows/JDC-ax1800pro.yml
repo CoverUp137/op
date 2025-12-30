@@ -8,8 +8,8 @@ on:
   
 
 env:
-  REPO_URL: https://github.com/VIKINGYFY/immortalwrt.git
-  REPO_BRANCH: main
+  REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
+  REPO_BRANCH: main-nss
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: jdc/ax1800pro.config
   DIY_P1_SH: jdc/diy1.sh
