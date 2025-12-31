@@ -184,6 +184,7 @@ jobs:
            2：新版istore界面
            3：USB网络驱动
            4：补全docker依赖
+           # 下recovery和sysupgrade这两个固件，先刷recovery
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
