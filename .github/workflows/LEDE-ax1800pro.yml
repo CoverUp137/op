@@ -12,7 +12,7 @@ env:
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: jdc/lede-ax1800pro.config
-  DIY_P1_SH: jdc/diy1.sh
+  DIY_P1_SH: jdc/diy3.sh
   DIY_P2_SH: jdc/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
