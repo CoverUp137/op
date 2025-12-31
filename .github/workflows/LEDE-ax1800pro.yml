@@ -179,7 +179,11 @@ jobs:
       run: |
         echo "release_tag=京东云亚瑟AX1800PRO-LEDE" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 京东云亚瑟AX1800PRO-LEDE
+         🈴 固件: 京东云亚瑟AX1800PRO-LEDE-测试固件
+           1: 超级残血NSS，只有有线有NSS加速，无线没有NSS，因为它源码里面就没无线NSS加速
+           2：新版istore界面
+           3：USB网络驱动
+           4：补全docker依赖
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
