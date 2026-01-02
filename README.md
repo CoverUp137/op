@@ -1,4 +1,3 @@
-# 每周自动编译
 ## 磊科N60 PRO:
 
 -  ***237高功率wifi源码，包含5.4和6.6的固件*** : 🌐 (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
@@ -9,6 +8,7 @@
 
 ## X86通用:
 -  ***immortalwrt源码，6.6内核*** ： 🌐 (https://github.com/immortalwrt/immortalwrt.git)
+
 
 
 
