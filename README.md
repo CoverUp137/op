@@ -4,10 +4,11 @@
 -  ***immortalwrt源码 24.10分支，6.6内核*** : 🌐 (https://github.com/immortalwrt/immortalwrt.git)
 
 ## 京东云亚瑟AX1800PRO:
--  ***LIBwrt满血NSS源码,6.6内核*** ： 🌐 (https://github.com/LiBwrt/openwrt-6.x.git)
+-  ***LIBwrt满血NSS源码,6.12内核*** ： 🌐 (https://github.com/LiBwrt/openwrt-6.x.git)
 
 ## X86通用:
 -  ***immortalwrt源码，6.6内核*** ： 🌐 (https://github.com/immortalwrt/immortalwrt.git)
+
 
 
 
