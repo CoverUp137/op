@@ -37,3 +37,6 @@
 
 # 看门狗
 # git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
+
+
+git clone https://github.com/nikkinikki-org/OpenWrt-nikki.git package/nikki
