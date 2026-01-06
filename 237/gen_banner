@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/sh /etc/rc.common
+START=99
 
-cat > /package/base-files/files/etc/banner << 'EOF'
+start() {
+cat > /etc/banner << 'EOF'
 ==============================================
   ____  _   _ _   _ ____ _____ _____ ____  
  / __ \| \ | | \ | |  _ \_   _|_   _/ __ \ 
@@ -14,10 +16,8 @@ cat > /package/base-files/files/etc/banner << 'EOF'
 系统状态：
 EOF
 
-# 存储空间
 echo "存储空间: $(df -h / | awk 'NR==2 {print $4 " / " $2 " (" $5 ")"}')" >> /etc/banner
 
-# 内存
 MEM_TOTAL_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
 MEM_FREE_KB=$(awk '/MemAvailable/ {print $2}' /proc/meminfo)
 MEM_USED_KB=$((MEM_TOTAL_KB - MEM_FREE_KB))
@@ -27,21 +27,14 @@ MEM_USED_MB=$((MEM_USED_KB / 1024))
 MEM_PERCENT=$(awk "BEGIN {printf \"%.1f\", ${MEM_USED_MB}/${MEM_TOTAL_MB}*100}")
 
 echo "运行内存: ${MEM_PERCENT}% (${MEM_USED_MB}MB/${MEM_TOTAL_MB}MB)" >> /etc/banner
-
-# 设备型号
 echo "设备型号: $(cat /tmp/sysinfo/model 2>/dev/null || echo "Netcore N60 Pro")" >> /etc/banner
-
-# 内核版本
 echo "内核版本: $(uname -r)" >> /etc/banner
-
-# 运行时间
 echo "运行时间: $(uptime | sed 's/.*up //; s/,.*//')" >> /etc/banner
 
-# 内网 IP（LAN）
 LAN_IP=$(ip -4 addr show br-lan 2>/dev/null | awk '/inet / {sub(/\/.*/,"",$2); print $2}')
 [ -z "$LAN_IP" ] && LAN_IP="N/A"
 echo "内网地址: ${LAN_IP}" >> /etc/banner
 
-# CPU 温度
 CPU_TEMP=$(awk '{printf "%.1f°C", $1/1000}' /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo "N/A")
 echo "CPU温度: ${CPU_TEMP}" >> /etc/banner
+}
