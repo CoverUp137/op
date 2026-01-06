@@ -13,7 +13,6 @@ cat > /etc/banner << 'EOF'
 
             Designed by WindyDay
 
-系统状态：
 EOF
 
 echo "存储空间: $(df -h / | awk 'NR==2 {print $4 " / " $2 " (" $5 ")"}')" >> /etc/banner
