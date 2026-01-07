@@ -119,13 +119,12 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
-
-    - name: Install custom banner script
+        
+    - name: Install custom banner
       run: |
-        mkdir -p openwrt/files/etc/init.d
-        cp 237/gen_banner openwrt/files/etc/init.d/gen_banner
-        chmod +x openwrt/files/etc/init.d/gen_banner
-
+        mkdir -p openwrt/files/etc
+        cp -f 237/banner openwrt/files/etc/banner
+         
     - name: Download package
       id: package
       run: |
