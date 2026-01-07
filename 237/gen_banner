@@ -14,7 +14,7 @@ cat > /etc/banner << 'EOF'
             Designed by WindyDay
 
 EOF
-
+echo "设备型号: $(cat /tmp/sysinfo/model 2>/dev/null || echo "Netcore N60 Pro")" >> /etc/banner
 echo "存储空间: $(df -h / | awk 'NR==2 {print $4 " / " $2 " (" $5 ")"}')" >> /etc/banner
 
 MEM_TOTAL_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
@@ -26,7 +26,6 @@ MEM_USED_MB=$((MEM_USED_KB / 1024))
 MEM_PERCENT=$(awk "BEGIN {printf \"%.1f\", ${MEM_USED_MB}/${MEM_TOTAL_MB}*100}")
 
 echo "运行内存: ${MEM_PERCENT}% (${MEM_USED_MB}MB/${MEM_TOTAL_MB}MB)" >> /etc/banner
-echo "设备型号: $(cat /tmp/sysinfo/model 2>/dev/null || echo "Netcore N60 Pro")" >> /etc/banner
 echo "内核版本: $(uname -r)" >> /etc/banner
 echo "运行时间: $(uptime | sed 's/.*up //; s/,.*//')" >> /etc/banner
 
