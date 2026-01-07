@@ -2,8 +2,9 @@
 START=99
 
 start() {
-sleep 2
-cat > /etc/banner << 'EOF'
+    sleep 2
+
+    cat > /etc/banner << 'EOF'
 ==============================================
   ____  _   _ _   _ ____ _____ _____ ____
  / __ \| \ | | \ | |  _ \_   _|_   _/ __ \
@@ -12,57 +13,64 @@ cat > /etc/banner << 'EOF'
  \____/|_| \_|_| \_|_| \_\|_|   |_|  \____/
 ==============================================
              Designed by WindyDay
-             
+
 EOF
 
-echo "设备型号: $(cat /tmp/sysinfo/model 2>/dev/null || echo "Netcore N60 Pro")" >> /etc/banner
+    echo "设备型号: $(cat /tmp/sysinfo/model 2>/dev/null || echo "Netcore N60 Pro")" >> /etc/banner
 
-# Overlay 空间
-OVERLAY_SPACE=$(df -h | awk '$NF=="/overlay" || ($NF=="/" && $1=="overlay") {print $4 " / " $2 " (" $5 ")"; exit}')
-[ -z "$OVERLAY_SPACE" ] && OVERLAY_SPACE="N/A"
-echo "存储空间: ${OVERLAY_SPACE}" >> /etc/banner
-# 内存信息
-MEM_TOTAL_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
-MEM_FREE_KB=$(awk '/MemAvailable/ {print $2}' /proc/meminfo)
-MEM_USED_KB=$((MEM_TOTAL_KB - MEM_FREE_KB))
+    # Overlay 空间
+    OVERLAY_SPACE=$(df -h | awk '$NF=="/overlay" || ($NF=="/" && $1=="overlay") {print $4 " / " $2 " (" $5 ")"; exit}')
+    [ -z "$OVERLAY_SPACE" ] && OVERLAY_SPACE="N/A"
+    echo "存储空间: ${OVERLAY_SPACE}" >> /etc/banner
 
-MEM_TOTAL_MB=$((MEM_TOTAL_KB / 1024))
-MEM_USED_MB=$((MEM_USED_KB / 1024))
-MEM_PERCENT=$(awk "BEGIN {printf \"%.1f\", ${MEM_USED_MB}/${MEM_TOTAL_MB}*100}")
+    # 内存信息
+    MEM_TOTAL_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+    MEM_FREE_KB=$(awk '/MemAvailable/ {print $2}' /proc/meminfo)
+    MEM_USED_KB=$((MEM_TOTAL_KB - MEM_FREE_KB))
 
-echo "运行内存: ${MEM_PERCENT}% (${MEM_USED_MB}MB/${MEM_TOTAL_MB}MB)" >> /etc/banner
+    MEM_TOTAL_MB=$((MEM_TOTAL_KB / 1024))
+    MEM_USED_MB=$((MEM_USED_KB / 1024))
+    MEM_PERCENT=$(awk "BEGIN {printf \"%.1f\", ${MEM_USED_MB}/${MEM_TOTAL_MB}*100}")
 
-echo "内核版本: $(uname -r)" >> /etc/banner
+    echo "运行内存: ${MEM_PERCENT}% (${MEM_USED_MB}MB/${MEM_TOTAL_MB}MB)" >> /etc/banner
+    echo "内核版本: $(uname -r)" >> /etc/banner
 
+    # CPU 温度
+    CPU_TEMP="N/A"
+    [ -f /sys/class/thermal/thermal_zone0/temp ] && \
+        CPU_TEMP=$(awk '{printf "%.1f°C", $1/1000}' /sys/class/thermal/thermal_zone0/temp)
+    echo "CPU温度: ${CPU_TEMP}" >> /etc/banner
 
-CPU_TEMP=$(awk '{printf "%.1f°C", $1/1000}' /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo "N/A")
-echo "CPU温度: ${CPU_TEMP}" >> /etc/banner
+    # WiFi 温度（LuCI）
+    TEMP_RAW=$(ubus call luci getTempInfo 2>/dev/null)
 
-TEMP_RAW=$(ubus call luci getTempInfo 2>/dev/null)
+    WIFI_24=$(echo "$TEMP_RAW" | sed -n 's/.*WiFi: \([0-9.]*°C\) .*/\1/p')
+    WIFI_5=$(echo "$TEMP_RAW" | sed -n 's/.*WiFi: [0-9.]*°C \([0-9.]*°C\).*/\1/p')
 
-WIFI_24=$(echo "$TEMP_RAW" | sed -n 's/.*WiFi: \([0-9.]*°C\) .*/\1/p')
-WIFI_5=$(echo "$TEMP_RAW" | sed -n 's/.*WiFi: [0-9.]*°C \([0-9.]*°C\).*/\1/p')
+    [ -z "$WIFI_24" ] && WIFI_24="N/A"
+    [ -z "$WIFI_5" ] && WIFI_5="N/A"
 
-[ -z "$WIFI_24" ] && WIFI_24="N/A"
-[ -z "$WIFI_5" ] && WIFI_5="N/A"
+    echo "WiFi 2.4G : ${WIFI_24}" >> /etc/banner
+    echo "WiFi 5G   : ${WIFI_5}" >> /etc/banner
 
-echo "WiFi 2.4G : ${WIFI_24}" >> /etc/banner
-echo "WiFi 5G   : ${WIFI_5}" >> /etc/banner
+    # 运行时间
+    UPTIME=$(awk '{
+        t=$1;
+        d=int(t/86400);
+        h=int((t%86400)/3600);
+        m=int((t%3600)/60);
+        if (d>0)
+            printf "%dd %dh %dm", d, h, m;
+        else
+            printf "%dh %dm", h, m;
+    }' /proc/uptime)
 
-UPTIME=$(awk '{
-  t=$1;
-  d=int(t/86400);
-  h=int((t%86400)/3600);
-  m=int((t%3600)/60);
-  if (d>0)
-    printf "%dd %dh %dm", d, h, m;
-  else
-    printf "%dh %dm", h, m;
-}' /proc/uptime)
+    echo "运行时间: ${UPTIME}" >> /etc/banner
 
-echo "运行时间: ${UPTIME}" >> /etc/banner
+    # LAN IP
+    LAN_IP=$(ip -4 addr show br-lan 2>/dev/null | awk '/inet / {sub(/\/.*/,"",$2); print $2}')
+    [ -z "$LAN_IP" ] && LAN_IP="N/A"
+    echo "Lan地址: ${LAN_IP}" >> /etc/banner
 
-LAN_IP=$(ip -4 addr show br-lan 2>/dev/null | awk '/inet / {sub(/\/.*/,"",$2); print $2}')
-[ -z "$LAN_IP" ] && LAN_IP="N/A"
-echo "Lan地址: ${LAN_IP}" >> /etc/banner
+    logger -t banner "Custom banner applied"
 }
