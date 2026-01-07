@@ -125,7 +125,6 @@ jobs:
         mkdir -p openwrt/files/etc/init.d
         cp 237/gen_banner openwrt/files/etc/init.d/gen_banner
         chmod +x openwrt/files/etc/init.d/gen_banner
-        chroot openwrt/etc/init.d/gen_banner enable
          
     - name: Download package
       id: package
