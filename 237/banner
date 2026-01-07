@@ -47,7 +47,20 @@ WIFI_5=$(echo "$TEMP_RAW" | sed -n 's/.*WiFi: [0-9.]*°C \([0-9.]*°C\).*/\1/p')
 
 echo "WiFi 2.4G : ${WIFI_24}" >> /etc/banner
 echo "WiFi 5G   : ${WIFI_5}" >> /etc/banner
-echo "运行时间: $(uptime | sed 's/.*up //; s/,.*//')" >> /etc/banner
+
+UPTIME=$(awk '{
+  t=$1;
+  d=int(t/86400);
+  h=int((t%86400)/3600);
+  m=int((t%3600)/60);
+  if (d>0)
+    printf "%dd %dh %dm", d, h, m;
+  else
+    printf "%dh %dm", h, m;
+}' /proc/uptime)
+
+echo "运行时间: ${UPTIME}" >> /etc/banner
+
 LAN_IP=$(ip -4 addr show br-lan 2>/dev/null | awk '/inet / {sub(/\/.*/,"",$2); print $2}')
 [ -z "$LAN_IP" ] && LAN_IP="N/A"
 echo "Lan地址: ${LAN_IP}" >> /etc/banner
