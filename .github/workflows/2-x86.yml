@@ -190,7 +190,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-X86-6.6" >> $GITHUB_OUTPUT
+        echo "release_tag=immortalwrt-X86-6.6" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: x86-6.6
          
