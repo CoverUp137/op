@@ -159,6 +159,12 @@ jobs:
         cd openwrt/bin/targets/*/*
         # 删除原来的 rm -rf packages 这一行
         # 现在保留 packages 文件夹
+        rm -rf *generic-kernel.bin
+        rm -rf sha256sums
+        rm -rf profiles.json
+        rm -rf *generic.manifest
+        rm -rg *squashfs-rootfs.img.gz
+        rm -rf *squashfs-combined.img.gz
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "PACKAGES_DIR=$PWD/packages" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
