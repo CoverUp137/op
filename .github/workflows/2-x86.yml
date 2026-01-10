@@ -163,8 +163,10 @@ jobs:
         rm -rf sha256sums
         rm -rf profiles.json
         rm -rf *generic.manifest
-        rm -rg *squashfs-rootfs.img.gz
+        rm -rf *squashfs-rootfs.img.gz
         rm -rf *squashfs-combined.img.gz
+        rm -rf version.buildinfo
+        rm -rf feeds.buildinfo
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "PACKAGES_DIR=$PWD/packages" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
@@ -205,6 +207,9 @@ jobs:
             3: 补全docker依赖
             4: 补全usb网络连接
             5: 包含编译好的插件包
+
+           - 正常情况下载squashfs-combined.img.gz安装即可
+           - PVE lxc 请下载 generic-rootfs.tar.gz
 
          📂 源码: $REPO_URL
 
