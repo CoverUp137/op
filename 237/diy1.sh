@@ -22,3 +22,6 @@
 #store商店
 git clone https://github.com/linkease/istore.git package/istore
 
+# lucky大吉
+git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
+
