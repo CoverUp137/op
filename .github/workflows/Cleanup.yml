@@ -1,4 +1,4 @@
-name: Cleanup Old Workflows and Releases
+name: Cleanup
 
 on:
   # 每天凌晨3点执行（UTC时间）
@@ -26,6 +26,6 @@ jobs:
          releases_keep_latest: 8
          releases_keep_keyword: 8
          delete_workflows: true
-         workflows_keep_day: 
+         workflows_keep_day: 8
          delete_tags: true
          gh_token: ${{ secrets.TOKEN }}
