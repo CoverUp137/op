@@ -28,4 +28,5 @@ jobs:
          delete_workflows: true
          workflows_keep_day: 8
          delete_tags: true
+         out_log: true
          gh_token: ${{ secrets.TOKEN }}
