@@ -1,0 +1,31 @@
+name: Cleanup Old Workflows and Releases
+
+on:
+  # 每天凌晨3点执行（UTC时间）
+#  schedule:
+#    - cron: '0 3 * * *'
+  # 也可以手动触发
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    
+      actions: write     
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 清理旧的工作流运行
+      - name: Delete releases and workflows runs
+        uses: ophub/delete-releases-workflows@main
+        with:
+         delete_releases: true
+         releases_keep_latest: 8
+         releases_keep_keyword: 8
+         delete_workflows: true
+         workflows_keep_day: 
+         delete_tags: true
+         gh_token: ${{ secrets.TOKEN }}
