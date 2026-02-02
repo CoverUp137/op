@@ -1,4 +1,4 @@
-name: 2-x86-istore
+name: x86-istore
 
 on:
   repository_dispatch:
