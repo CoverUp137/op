@@ -1,4 +1,4 @@
-name: LIB-ax18000pro
+name: JDC-LIB-ax18000pro
 
 on:
   repository_dispatch:
