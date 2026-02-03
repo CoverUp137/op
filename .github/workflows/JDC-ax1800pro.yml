@@ -1,11 +1,10 @@
-name: JDC-LIB-ax18000pro
+name: JDC-AX1800 PRO
 
 on:
+#  schedule:
+#    - cron: 0 10 * * 0
   repository_dispatch:
   workflow_dispatch:
-  
- # schedule:
- #  - cron: 0 11 * * 2
   
 
 env:
@@ -53,6 +52,7 @@ jobs:
         npm_clean: "True"
         os_swap: "True"
 
+
     - name: Free up disk space complete
       run: |
         echo "Free up disk space complete"
@@ -97,7 +97,7 @@ jobs:
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
-      
+
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
 
@@ -146,6 +146,7 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
+        rm -rf packages
         rm -rf *initramfs*
         rm -rf *.manifest
         rm -rf version.buildinfo
@@ -153,7 +154,6 @@ jobs:
         rm -rf profiles.json
         rm -rf feeds.buildinfo
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "PACKAGES_DIR=$PWD/packages" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware directory
@@ -163,34 +163,17 @@ jobs:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
-    - name: Package plugins directory
-      id: package_plugins
-      if: steps.organize.outputs.status == 'success' && !cancelled()
-      run: |
-        # 检查 packages 目录是否存在
-        if [ -d "${{ env.PACKAGES_DIR }}" ]; then
-          cd ${{ env.PACKAGES_DIR }}
-          # 创建包含所有插件的压缩包
-          tar -czf ${{ github.workspace }}/packages.tar.gz .
-          echo "PACKAGES_TAR=${{ github.workspace }}/packages.tar.gz" >> $GITHUB_ENV
-          echo "status=success" >> $GITHUB_OUTPUT
-        else
-          echo "Packages directory not found!"
-          echo "status=failed" >> $GITHUB_OUTPUT
-        fi
-
     - name: Generate release tag
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=LIB-京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
+        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: LIB-京东云亚瑟AX1800PRO-满血NSS
+         🈴 固件: 京东云亚瑟AX1800PRO-(apk软件包)
          
-            1： 满血NSS，精简版固件
-            2： 补全USB网络驱动
-            3： 增加openclash  
-            4： 补全docker依赖在底下packages的压缩包中下载安装  
+            1： 满血NSS
+            2： 增加USB网络驱动
+            3： 添加openclash，docker
          
          📝 设备: 京东云亚瑟AX1800 Pro
          
@@ -213,7 +196,6 @@ jobs:
          🔒 密码: password (或空密码)" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
-        
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
@@ -222,9 +204,7 @@ jobs:
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
-        files: |
-          ${{ env.FIRMWARE }}/*
-          ${{ env.PACKAGES_TAR }}
+        files: ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@v2
