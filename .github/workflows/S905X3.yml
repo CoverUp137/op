@@ -159,7 +159,7 @@ jobs:
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
         openwrt_board: s905x3_s905d
-        openwrt_kernel: 6.12.53
+        openwrt_kernel: 6.12.70_6.6.95_6.18.9
         openwrt_ip: 192.168.2.9
 
     - name: Upload firmware directory
@@ -219,8 +219,8 @@ jobs:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: |
-          ${{ env.PACKAGES_TAR }}
           ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+        #  ${{ env.PACKAGES_TAR }}
         #  ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
