@@ -158,7 +158,7 @@ jobs:
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
         openwrt_board: s905x3
-        openwrt_kernel: 6.12.70
+        openwrt_kernel: 6.12.53
         openwrt_ip: 192.168.2.9
 
     - name: Upload firmware directory
