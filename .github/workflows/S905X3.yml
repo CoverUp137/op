@@ -158,7 +158,7 @@ jobs:
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
-        openwrt_board: s905x3
+        openwrt_board: s905x3_s905d
         openwrt_kernel: 6.12.53
         openwrt_ip: 192.168.2.9
 
@@ -189,17 +189,12 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=HK1-BOX-S905X3" >> $GITHUB_OUTPUT
+        echo "release_tag=Amlogic" >> $GITHUB_OUTPUT
         echo "
            
          
-         📝 设备: HK1 BOX
          
-         🧠 内存: 2GB/4GB
-         
-         💾 存储: 32/64GBN
-         
-         💻 架构: Amlogic S905X3
+         💻 架构: Amlogic 
 
          📂 源码: $REPO_URL
 
