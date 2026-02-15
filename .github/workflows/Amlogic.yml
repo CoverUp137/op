@@ -12,7 +12,7 @@ env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
   REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: Amlogic/s905x3.config
+  CONFIG_FILE: Amlogic/Amlogic.config
   DIY_P1_SH: Amlogic/diy1.sh
   DIY_P2_SH: Amlogic/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -161,6 +161,7 @@ jobs:
         openwrt_board: s905x3_s905d
         openwrt_kernel: 6.12.70_6.6.95_6.18.9
         openwrt_ip: 192.168.2.9
+        builder_name: WindyDay
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
