@@ -223,9 +223,9 @@ jobs:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: |
-          ${{ env.FIRMWARE }}/*
           ${{ env.PACKAGES_TAR }}
           ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+        #  ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@v2
