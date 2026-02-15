@@ -153,7 +153,8 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Package armsr-armv8 as OpenWrt
-      uses: ophub/amlogic-s9xxx-openwrt@main
+#      uses: ophub/amlogic-s9xxx-openwrt@main
+      uses: unifreq/openwrt_packit@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
