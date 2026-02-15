@@ -1,4 +1,4 @@
-name: Amlogic
+name: Amlogic-ophub
 
 on:
   repository_dispatch:
@@ -153,8 +153,7 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Package armsr-armv8 as OpenWrt
-#      uses: ophub/amlogic-s9xxx-openwrt@main
-      uses: unifreq/openwrt_packit@master
+      uses: ophub/amlogic-s9xxx-openwrt@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
@@ -190,10 +189,11 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=Amlogic" >> $GITHUB_OUTPUT
+        echo "release_tag=Amlogic-ophub" >> $GITHUB_OUTPUT
         echo "
-           
-         
+            
+             使用ophub打包脚本进行打包
+             
          
          💻 架构: Amlogic 
 
