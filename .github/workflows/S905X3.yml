@@ -9,12 +9,12 @@ on:
   
 
 env:
-  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
-  REPO_BRANCH: openwrt-24.10-6.6
+  REPO_URL: https://github.com/immortalwrt/immortalwrt.git
+  REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 237/6.7.config
-  DIY_P1_SH: 237/diy1.sh
-  DIY_P2_SH: 237/diy2.sh
+  CONFIG_FILE: Amlogic/s905x3.config
+  DIY_P1_SH: Amlogic/diy1.sh
+  DIY_P2_SH: Amlogic/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -110,11 +110,6 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
         
-  #  - name: Install custom banner script
-  #    run: |
-    #    mkdir -p openwrt/files/etc/init.d
-   #     cp 237/gen_banner openwrt/files/etc/init.d/gen_banner
-   #     chmod +x openwrt/files/etc/init.d/gen_banner
          
     - name: Download package
       id: package
@@ -162,9 +157,9 @@ jobs:
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
-        openwrt_board: s905x3_s905x2_s905x_s905w_s905d_s922x_s912
-        openwrt_kernel: 6.12.y_6.18.y
-        openwrt_ip: 192.168.1.1
+        openwrt_board: s905x3
+        openwrt_kernel: 6.12.70
+        openwrt_ip: 192.168.2.9
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
@@ -197,19 +192,15 @@ jobs:
         echo "
 
             1:  使用237大佬源码编译的高功率wifi固件，内核6.6
-            2： 补全docker缺损的模块以及其他kmod模块
-            3： 补全USB网络驱动
-            4:  增加istore软件商店，微信推送，网络唤醒，unpn，ftp等插件
-                魔法上网插件自行在  系统→软件包  内安装
-            5:  编译出来的插件和kmod模块在底下package压缩包中自行查找{无需求可忽略}
+           
          
-         📝 设备: 磊科Netcore N60 Pro
+         📝 设备: HK1 BOX
          
-         🧠 内存: 512MB/2GB
+         🧠 内存: 2GB/4GB
          
-         💾 存储: 128MB
+         💾 存储: 32/64GBN
          
-         💻 架构: MediaTek MT7986A (Filogic 830)
+         💻 架构: Amlogic S905X3
 
          📂 源码: $REPO_URL
 
