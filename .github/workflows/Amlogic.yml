@@ -1,4 +1,4 @@
-name: S905X3
+name: Amlogic
 
 on:
   repository_dispatch:
