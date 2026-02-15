@@ -188,10 +188,8 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-padavanonly-6.6-power-docker-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=HK1-BOX-S905X3" >> $GITHUB_OUTPUT
         echo "
-
-            1:  使用237大佬源码编译的高功率wifi固件，内核6.6
            
          
          📝 设备: HK1 BOX
@@ -208,7 +206,7 @@ jobs:
 
          ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-         🌐 管理地址: 192.168.2.1
+         🌐 管理地址: 192.168.2.9
 
          👤 用户名: root
 
