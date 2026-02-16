@@ -15,7 +15,7 @@
 
 
 - ### 京东云亚瑟AX1800pro
-  关机长按 `reset` 键5秒,`Lan`口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
+  关机长按 `reset` 键5秒,`Lan(不要使用2.5Glan口)`口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
   等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
 
 
@@ -28,6 +28,7 @@
 - (https://github.com/ophub/flippy-openwrt-actions.git)
 - (https://github.com/unifreq/openwrt_packit.git)
 - (https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#%E4%BD%BF%E7%94%A8-github-actions-%E8%BF%9B%E8%A1%8C%E7%BC%96%E8%AF%91)
+
 
 
 
