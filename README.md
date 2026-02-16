@@ -1,3 +1,8 @@
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/5fcf18e1-ed16-49d3-9004-5301ac8d4309" alt="OpenWrt" />
+</div>
+
+
 ## 磊科N60 PRO:
 
 -  ***237高功率wifi源码，5.4和6.6内核固件*** : 🌐 (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
@@ -8,6 +13,7 @@
 
 ## X86通用:
 -  ***immortalwrt源码，6.6内核*** ： 🌐 (https://github.com/immortalwrt/immortalwrt.git)
+
 
 
 
