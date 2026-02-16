@@ -11,7 +11,7 @@
 
 
 - ### 磊科 N60PRO
-  关机长按reset键5秒,`千兆Lan  (不要使用2.5G lan)`  口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传固件输入等待重启即可
+  关机长按reset键5秒,`千兆Lan  (不要使用2.5G lan)`  口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传固件刷入等待重启即可
 
 
 - ### 京东云亚瑟AX1800pro
@@ -28,6 +28,7 @@
 - (https://github.com/ophub/flippy-openwrt-actions.git)
 - (https://github.com/unifreq/openwrt_packit.git)
 - (https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#%E4%BD%BF%E7%94%A8-github-actions-%E8%BF%9B%E8%A1%8C%E7%BC%96%E8%AF%91)
+
 
 
 
