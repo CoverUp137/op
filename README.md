@@ -15,8 +15,8 @@
 
 
 - ### 京东云亚瑟AX1800PTO
-关键长按reset键5秒,`Lan`口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
-等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
+  关键长按reset键5秒,`Lan`口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
+  等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
 
 
 ## 🤝 源码编译链接
@@ -24,6 +24,7 @@
 - (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
 - (https://github.com/immortalwrt/immortalwrt.git)
 - (https://github.com/LiBwrt/openwrt-6.x.git)
+
 
 
 
