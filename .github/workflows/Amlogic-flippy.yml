@@ -1,4 +1,4 @@
-name: Amlogic-flippy2
+name: Amlogic-flippy
  
 on:
   repository_dispatch:
@@ -190,7 +190,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=Amlogic-flippy2" >> $GITHUB_OUTPUT
+        echo "release_tag=Amlogic-flippy" >> $GITHUB_OUTPUT
         echo "
             
              使用flippy打包脚本进行打包
