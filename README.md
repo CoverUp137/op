@@ -3,16 +3,16 @@
 </div>
 
 
-## 磊科N60 PRO:
 
--  ***237高功率wifi源码，5.4和6.6内核固件*** : 🌐 (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
--  ***immortalwrt源码 24.10分支，6.6内核*** : 🌐 (https://github.com/immortalwrt/immortalwrt.git)
+## 安装及升级 OpenWrt 的相关说明
+- ### 晶晨盒子安装 OpenWrt，以ophub内核为例
+ 1. `Amlogic` 和 `Allwinner` 平台，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将固件写入 USB 里，然后把写好固件的 USB 插入盒子。浏览器访问 OpenWrt 的 IP(例如 192.168.1.1) → `使用默认账户登录进入 OpenWrt` → `系统菜单` → `晶晨宝盒` → `安装 OpenWrt` ，在支持的设备下拉列表中选择你的盒子，点击 `安装 OpenWrt` 按钮进行安装。
 
-## 京东云亚瑟AX1800PRO:
--  ***LIBwrt满血NSS源码,6.12内核*** ： 🌐 (https://github.com/LiBwrt/openwrt-6.x.git)
 
-## X86通用:
--  ***immortalwrt源码，6.6内核*** ： 🌐 (https://github.com/immortalwrt/immortalwrt.git)
+
+
+
+
 
 
 
