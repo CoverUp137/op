@@ -221,6 +221,7 @@ jobs:
         body_path: release.txt
         files: |
           ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+          ${{ env.FIRMWARE }}/*.tar.gz
         #  ${{ env.PACKAGES_TAR }}
         #  ${{ env.FIRMWARE }}/*
         
