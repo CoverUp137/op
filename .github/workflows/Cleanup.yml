@@ -2,8 +2,8 @@ name: Cleanup
 
 on:
   # 每天凌晨3点执行（UTC时间）
-#  schedule:
-#    - cron: '0 3 * * *'
+  schedule:
+    - cron: '0 3 * * *'
   # 也可以手动触发
   workflow_dispatch:
 
