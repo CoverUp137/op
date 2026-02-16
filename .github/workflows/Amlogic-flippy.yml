@@ -221,6 +221,8 @@ jobs:
         body_path: release.txt
         files: |
           ${{ env.PACKAGED_OUTPUTPATH }}/*.img.gz
+        #  ${{ env.PACKAGES_TAR }}
+        #  ${{ env.FIRMWARE }}/*
         
 
     - name: Delete workflow runs
