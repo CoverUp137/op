@@ -158,7 +158,8 @@ jobs:
       with:
         openwrt_path: ${{ env.FIRMWARE }}/*rootfs.tar.gz
         openwrt_board: s905x3_s905d
-        openwrt_kernel: 6.12.70_6.6.95_6.18.9
+        openwrt_kernel: 6.12.y_6.6.y_6.18.y
+        auto_kernel: true
         openwrt_ip: 192.168.2.9
         builder_name: WindyDay
 
