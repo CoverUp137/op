@@ -6,7 +6,7 @@ on:
   
  # schedule:
  #  - cron: 0 11 * * 2 
-  
+    
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
