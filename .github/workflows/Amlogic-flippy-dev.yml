@@ -1,4 +1,4 @@
-name: Amlogic-flippy
+name: Amlogic-flippy-dev
  
 on:
   repository_dispatch:
