@@ -153,7 +153,7 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
         
     - name: Package OpenWrt flippy
-      uses: ophub/flippy-openwrt-actions@main
+      uses: CoverUp137/flippy-openwrt-actions@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       env:
         OPENWRT_ARMSR: ${{ env.FIRMWARE }}/*.tar.gz
