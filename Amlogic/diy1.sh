@@ -3,4 +3,4 @@ git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
 git clone https://github.com/linkease/istore.git package/istore
 git clone https://github.com/nikkinikki-org/OpenWrt-nikki.git package/nikki
 
-git clone https://github.com/gngpp/luci-theme-design.git  package/luci-theme-design
+git clone https://github.com/gngpp/luci-theme-design.git package/luci-theme-design
