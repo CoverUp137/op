@@ -10,6 +10,8 @@
 
 
 
+- ### 磊科 N60PRO
+  关键长按reset键5秒,`Lan`口连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传固件等待重启即可
 
 
 
@@ -20,6 +22,7 @@
 - (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
 - (https://github.com/immortalwrt/immortalwrt.git)
 - (https://github.com/LiBwrt/openwrt-6.x.git)
+
 
 
 
