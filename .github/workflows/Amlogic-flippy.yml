@@ -12,8 +12,8 @@ env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
   REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: Amlogic/Amlogic.config
-  DIY_P1_SH: Amlogic/diy1.sh
+  CONFIG_FILE: Amlogic/lede.config
+  DIY_P1_SH: Amlogic/lede.sh
   DIY_P2_SH: Amlogic/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
