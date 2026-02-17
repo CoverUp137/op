@@ -190,7 +190,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=Amlogic-flippy" >> $GITHUB_OUTPUT
+        echo "release_tag=Amlogic-LEDE-flippy" >> $GITHUB_OUTPUT
         echo "
             
              使用flippy打包脚本进行打包
