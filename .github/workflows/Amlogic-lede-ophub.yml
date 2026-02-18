@@ -9,8 +9,8 @@ on:
     
 
 env:
-  REPO_URL: https://github.com/immortalwrt/immortalwrt.git
-  REPO_BRANCH: openwrt-24.10
+  REPO_URL: https://github.com/coolsnowwolf/lede.git
+  REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: Amlogic/Amlogic-lede.config
   DIY_P1_SH: Amlogic/lede.sh
