@@ -191,7 +191,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-padavanonly-6.6-power-docker-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=padavanonly-6.6-power-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
 
             1:  使用237大佬源码编译的高功率wifi固件，内核6.6
