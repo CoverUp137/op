@@ -195,11 +195,11 @@ jobs:
         echo "
 
             1:  使用237大佬源码编译的高功率wifi固件，内核6.6
-            2： 补全dockerman依赖
+            2： 补全dockerman依赖以及其他插件缺少的kmod依赖
             3： 补全USB网络驱动
             4:  增加istore软件商店，lucky，网络唤醒，unpn，ftp等插件
                 魔法上网插件自行在  系统→软件包  内安装
-            5:  编译出来的插件和kmod模块在底下package压缩包中自行查找{无需求可忽略}
+            5:  编译出来的插件和kmod依赖在底下package压缩包中自行查找{无需求可忽略}
          
          📝 设备: 磊科Netcore N60 Pro
          
