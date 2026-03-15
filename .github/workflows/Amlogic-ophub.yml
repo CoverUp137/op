@@ -12,7 +12,7 @@ env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
   REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: Amlogic/Amlogic.config
+  CONFIG_FILE: Amlogic/imm.config
   DIY_P1_SH: Amlogic/diy1.sh
   DIY_P2_SH: Amlogic/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -160,7 +160,7 @@ jobs:
         openwrt_board: s905x3_s905d
         openwrt_kernel: 6.12.y_6.6.y_6.18.y
         auto_kernel: true
-        openwrt_ip: 192.168.2.9
+        openwrt_ip: 192.168.2.3
         builder_name: WindyDay
 
     - name: Upload firmware directory
@@ -204,7 +204,7 @@ jobs:
 
          ⏱️ 编译时间: $(date +"%Y年%m月%d日 %H时%M分")
 
-         🌐 管理地址: 192.168.2.9
+         🌐 管理地址: 192.168.2.3
 
          👤 用户名: root
 
