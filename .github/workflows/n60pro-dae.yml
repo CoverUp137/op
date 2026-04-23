@@ -193,8 +193,7 @@ jobs:
       run: |
         echo "release_tag=netcore-n60pro-dae" >> $GITHUB_OUTPUT
         echo "
-               《dae版本为支持dae和daed透明代理》
-			   
+               《dae版本为支持dae和daed透明代理》			   
             1:  使用237大佬源码编译的高功率wifi固件，内核6.6
             2： 补全dockerman依赖以及其他插件缺少的kmod依赖
             3： 补全USB网络驱动
