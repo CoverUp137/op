@@ -1,4 +1,4 @@
-name: 237-6.6-power-docker-n60pro
+name: n60pro
 
 on:
   repository_dispatch:
@@ -191,13 +191,13 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=padavanonly-6.6-power-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
 
             1:  使用237大佬源码编译的高功率wifi固件，内核6.6
             2： 补全dockerman依赖以及其他插件缺少的kmod依赖
             3： 补全USB网络驱动
-            4:  增加istore软件商店，lucky，网络唤醒，unpn，ftp等插件
+            4:  增加istore软件商店，lucky，网络唤醒，unpn，ftp，一键分区等插件
                 魔法上网插件自行在  系统→软件包  内安装
             5:  编译出来的插件和kmod依赖在底下package压缩包中自行查找{无需求可忽略}
          
