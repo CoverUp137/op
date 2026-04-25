@@ -10,3 +10,4 @@ git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-part
 # git clone https://github.com/sirpdboy/luci-app-watchdog package/watchdog
 git clone https://github.com/sirpdboy/luci-app-taskplan package/luci-app-taskplan
 git clone https://github.com/QiuSimons/luci-app-daed package/dae
+git clone https://github.com/QiuSimons/vmlinux-btf.git package/vmlinux-btf
