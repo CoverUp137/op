@@ -183,7 +183,7 @@ jobs:
       run: |
         echo "release_tag=京东云亚瑟AX1800PRO-满血NSS-dae" >> $GITHUB_OUTPUT
         echo "
-         🈴 固件: 非1G内存的亚瑟不推荐刷此固件，dae/daed很吃内存
+         🈴 非1G内存的亚瑟不推荐刷此固件，dae/daed很吃内存
          
          🈴 此固件添加dae/daed代理的依赖，需要dae/daed请在系统--软件包下载
          🈴 软件包--配置APK-/etc/apk/repositories.d/distfeeds.list 打开下面的国内源地址，并复制里面的内容粘贴
