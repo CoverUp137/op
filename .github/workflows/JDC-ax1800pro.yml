@@ -11,7 +11,7 @@ env:
   REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
   REPO_BRANCH: main-nss
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: jdc/ax1800dae.config
+  CONFIG_FILE: jdc/lib-ax1800.config
   DIY_P1_SH: jdc/diy1.sh
   DIY_P2_SH: jdc/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -174,14 +174,13 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS-dae版" >> $GITHUB_OUTPUT
+        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 京东云亚瑟AX1800PRO-(apk软件包)
          
             1： 满血NSS
             2： 增加USB网络驱动
             3： 添加openclash，dockerman，partexp,nikki等
-            4:  🈲添加dae/daed的支持，512m内存谨慎开启🈲
    
          
          📝 设备: 京东云亚瑟AX1800 Pro
