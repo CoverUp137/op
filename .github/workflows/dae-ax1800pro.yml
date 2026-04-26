@@ -184,7 +184,11 @@ jobs:
         echo "release_tag=京东云亚瑟AX1800PRO-满血NSS-dae" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 京东云亚瑟AX1800PRO-(apk软件包)
-         🈴 此固件添加dae/daed代理的依赖，需要dae/daed请在自带op插件商店下载
+         🈴 此固件添加dae/daed代理的依赖，需要dae/daed请在系统--软件包下载
+         🈴 软件包--配置APK-/etc/apk/repositories.d/distfeeds.list 打开下面的国内源地址，并复制里面的内容粘贴
+         [国内源下载](https://raw.githubusercontent.com/CoverUp137/op/refs/heads/main/jdc/distfeeds.list)
+
+         
          🈴 此固件需要刷大内核分区才可刷入，正常的亚瑟内核是6M，需要刷入12m内核分区表和uboot
           详情请看：[京东云亚瑟AX1800 Pro 大内核分区刷写教程](https://github.com/CoverUp137/op#%E4%BA%AC%E4%B8%9C%E4%BA%91%E4%BA%9A%E7%91%9Fax1800-pro---12m%E5%A4%A7%E5%86%85%E6%A0%B8%E5%88%86%E5%8C%BA%E5%88%B7%E5%86%99%E6%95%99%E7%A8%8B)
 
