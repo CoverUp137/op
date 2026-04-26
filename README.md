@@ -18,16 +18,25 @@
   关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
   等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
 
-- ### 京东云亚瑟AX1800pro-12M大内核分区刷写教程
-  1: 关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/uboot.html`，刷入`12M-u-boot.bin`
-  
-  2：关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/img.html`，上传`gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin`刷写分区表
-  
-  3： 关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/big.html`，上传刷入 `squashfs-factory.bin`
- 等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
+- ### 京东云亚瑟AX1800 Pro - 12M大内核分区刷写教程
+  **准备工作**：确保路由器已关机，使用网线连接电脑与路由器 `Lan` 口。
 
-   12M-u-boot.bin下载地址：(https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/12M-u-boot.bin)
-   12M大分区表下载：(https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin)
+  **1. 刷入 12M U-Boot**
+  1. 长按 `reset` 键并通电，保持约5秒后松开，使设备进入 Uboot 模式。
+  2. 电脑浏览器打开 `http://192.168.1.1/uboot.html`，选择 `12M-u-boot.bin` 文件进行刷入。
+     - 下载地址：https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/12M-u-boot.bin
+
+  **2. 刷写大分区表**
+  1. 断电，再次长按 `reset` 键5秒进入 Uboot。
+  2. 浏览器访问 `http://192.168.1.1/img.html`，上传 `gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin` 并刷写分区表。
+     - 下载地址：https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin
+
+  **3. 刷入 OpenWrt 固件并升级**
+  1. 断电后再次长按 `reset` 键5秒进入 Uboot。
+  2. 浏览器访问 `http://192.168.1.1/big.html`，上传 `squashfs-factory.bin` 并刷入。
+  3. 刷写完成后等待绿灯亮起（表示系统已启动）。
+  4. 电脑浏览器输入 `192.168.2.3` 进入 OpenWrt 后台。
+  5. 依次点击 `备份与更新` → `更新固件`，选择 `squashfs-sysupgrade.bin` 完成最终升级。
     
  
 
