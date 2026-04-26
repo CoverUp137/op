@@ -22,17 +22,17 @@
   **准备工作**：确保路由器已关机，使用网线连接电脑与路由器 `Lan` 口。
 
   **1. 刷入 12M U-Boot**
-  1. 长按 `reset` 键并通电，保持约5秒后松开，使设备进入 Uboot 模式。
+  1. 长按 `reset` 键并通电，保持约5秒后松开，红灯闪烁至蓝灯长亮后，使设备进入 Uboot 模式。
   2. 电脑浏览器打开 `http://192.168.1.1/uboot.html`，选择 `12M-u-boot.bin` 文件进行刷入。
      - 下载地址：https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/12M-u-boot.bin
 
   **2. 刷写大分区表**
-  1. 断电，再次长按 `reset` 键5秒进入 Uboot。
+  1. 断电，再次长按 `reset` 键5秒，通电，红灯闪烁至蓝灯长亮后。
   2. 浏览器访问 `http://192.168.1.1/img.html`，上传 `gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin` 并刷写分区表。
      - 下载地址：https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin
 
   **3. 刷入 OpenWrt 固件并升级**
-  1. 断电后再次长按 `reset` 键5秒进入 Uboot。
+  1. 断电后再次长按 `reset` 键5秒，通电，红灯闪烁至蓝灯长亮后。
   2. 浏览器访问 `http://192.168.1.1/big.html`，上传 `squashfs-factory.bin` 并刷入。
   3. 刷写完成后等待绿灯亮起（表示系统已启动）。
   4. 电脑浏览器输入 `192.168.2.3` 进入 OpenWrt 后台。
