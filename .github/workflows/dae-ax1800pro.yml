@@ -186,8 +186,10 @@ jobs:
          🈴 非1G内存的亚瑟不推荐刷此固件，dae/daed很吃内存
          
          🈴 此固件添加dae/daed代理的依赖，需要dae/daed请在系统--软件包下载
-         🈴 软件包--配置APK-/etc/apk/repositories.d/distfeeds.list 打开下面的国内源地址，并复制里面的内容粘贴
-         [国内源下载](https://raw.githubusercontent.com/CoverUp137/op/refs/heads/main/jdc/distfeeds.list)
+         🔧 一键更换国内软件源（SSH 执行）：
+           \`\`\`bash
+         sed -i 's|https://downloads.immortalwrt.org|https://mirror.nju.edu.cn/immortalwrt|g' /etc/apk/repositories.d/distfeeds.list
+          \`\`\`
 
          
          🈴 此固件需要刷大内核分区才可刷入，正常的亚瑟内核是6M，需要刷入12m内核分区表和12m-uboot
