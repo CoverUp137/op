@@ -181,7 +181,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS-dae" >> $GITHUB_OUTPUT
+        echo "release_tag=京东云亚瑟AX1800PRO-满血NSS-dae2" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 京东云亚瑟AX1800PRO-(apk软件包)
          
