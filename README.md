@@ -18,7 +18,15 @@
   关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
   等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
 
-
+- ### 京东云亚瑟AX1800pro-12M大内核分区刷写教程
+  1: 关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/uboot.html`，刷入`12M-u-boot.bin`
+  
+  2：关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/img.html`，上传`gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin`刷写分区表
+  
+  3： 关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/big.html`，上传刷入 `squashfs-factory.bin`
+ 等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
+    
+ 
 
 ### 🤝 编译源码
 - (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
