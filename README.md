@@ -25,6 +25,9 @@
   
   3： 关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`http://192.168.1.1/big.html`，上传刷入 `squashfs-factory.bin`
  等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
+
+   12M-u-boot.bin下载地址：(https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/12M-u-boot.bin)
+   12M大分区表下载：(https://github.com/CoverUp137/op/raw/refs/heads/main/jdc/gpt-JDC_AX1800_Pro_dual-boot_rootfs1024M_HLOS12M_no-last-partition.bin)
     
  
 
