@@ -15,7 +15,7 @@
 
 
 - ### 京东云亚瑟AX1800pro
-  关机长按 `reset` 键5秒,`Lan` 连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
+  关机长按 `reset` 键5秒后通电,`Lan` 连接电脑 → 浏览器输入`192.168.1.1` 进入uboot → 上传刷入 `squashfs-factory.bin`
   等待绿灯后，浏览器输入`192.168.2.3` → `备份与更新` → `更新固件` →  `squashfs-sysupgrade.bin`
 
 - ### 京东云亚瑟AX1800 Pro - 12M大内核分区刷写教程
