@@ -177,7 +177,9 @@ jobs:
         echo "release_tag=京东云亚瑟AX1800PRO-满血NSS" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 京东云亚瑟AX1800PRO-(apk软件包)
-         
+         🈴 软件包--配置APK-/etc/apk/repositories.d/distfeeds.list 打开下面的国内源地址，并复制里面的内容粘贴
+         [国内源下载](https://raw.githubusercontent.com/CoverUp137/op/refs/heads/main/jdc/distfeeds.list)
+
             1： 满血NSS
             2： 增加USB网络驱动
             3： 添加openclash，dockerman，partexp,nikki等
