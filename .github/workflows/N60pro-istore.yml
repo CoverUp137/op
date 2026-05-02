@@ -13,7 +13,7 @@ env:
   REPO_BRANCH: openwrt-24.10-6.6
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: 237/store.config
-  DIY_P1_SH: 237/diy3.sh
+  DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
@@ -192,9 +192,9 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=netcore-n60pro-store33333" >> $GITHUB_OUTPUT
+        echo "release_tag=netcore-n60pro-istore" >> $GITHUB_OUTPUT
         echo "
-
+               《此固件为istore风味固件，全新istore界面》
             1:  使用237大佬源码编译的高功率wifi固件，内核6.6
             2： 补全dockerman依赖以及其他插件缺少的kmod依赖
             3： 补全USB网络驱动
