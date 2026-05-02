@@ -12,7 +12,7 @@ env:
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
   REPO_BRANCH: 2410
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 237/5.4.config
+  CONFIG_FILE: 237/store.config
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
@@ -162,7 +162,7 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-padavanonly-5.4-power-netcore-n60pro" >> $GITHUB_OUTPUT
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-5.4-power-netcore-n60pro" >> $GITHUB_OUTPUT
         echo "
          🈴 固件: 237-24.10-5.4内核-高功率wifi驱动
          
