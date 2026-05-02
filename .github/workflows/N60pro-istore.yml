@@ -1,4 +1,4 @@
-name: n60pro-tore2
+name: n60pro-store
 
 on:
   repository_dispatch:
