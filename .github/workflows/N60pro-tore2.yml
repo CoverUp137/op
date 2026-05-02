@@ -108,6 +108,7 @@ jobs:
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_P2_SH
         cd openwrt
+        sed -i '/^PKG_BUILD_PARALLEL:=1/a PKG_FORTIFY_SOURCE:=0' feeds/packages/libs/libxcrypt/Makefile
         $GITHUB_WORKSPACE/$DIY_P2_SH
         
   #  - name: Install custom banner script
