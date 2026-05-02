@@ -15,6 +15,7 @@ env:
   CONFIG_FILE: 237/store.config
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
+  ISTORE_BACKEND_FILE: 237/istore_backend.lua
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -109,6 +110,21 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         sed -i '/^PKG_BUILD_PARALLEL:=1/a PKG_FORTIFY_SOURCE:=0' feeds/packages/libs/libxcrypt/Makefile
+        
+        # 替换 istore_backend.lua 修复MT798X 使用istore不显示温度的BUG
+        if [ -e "$GITHUB_WORKSPACE/$ISTORE_BACKEND_FILE" ]; then
+          ISTORE_BACKEND=$(find . -path "*/controller/istore_backend.lua" -print -quit 2>/dev/null)
+          if [ -n "$ISTORE_BACKEND" ]; then
+            echo "Found: $ISTORE_BACKEND"
+            cp "$GITHUB_WORKSPACE/$ISTORE_BACKEND_FILE" "$ISTORE_BACKEND"
+            echo "Replaced with $ISTORE_BACKEND_FILE"
+          else
+            echo "Warning: istore_backend.lua not found in source tree"
+          fi
+        else
+          echo "Warning: $ISTORE_BACKEND_FILE not found in workspace"
+        fi
+        
         $GITHUB_WORKSPACE/$DIY_P2_SH
         
   #  - name: Install custom banner script
