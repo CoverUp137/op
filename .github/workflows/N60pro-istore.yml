@@ -17,7 +17,6 @@ env:
   DIY_P2_SH: 237/diy2.sh
   ISTORE_BACKEND_SRC: 237/istore_backend.lua
   ISTORE_BACKEND_DST: feeds/nas_luci/luci/luci-app-quickstart/luasrc/controller/istore_backend.lua
-  # ====================================
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
