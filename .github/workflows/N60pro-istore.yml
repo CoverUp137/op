@@ -16,7 +16,6 @@ env:
   DIY_P1_SH: 237/diy1.sh
   DIY_P2_SH: 237/diy2.sh
   ISTORE_BACKEND_SRC: 237/istore_backend.lua
-  ISTORE_BACKEND_DST: feeds/nas_luci/luci/luci-app-quickstart/luasrc/controller/istore_backend.lua
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -106,13 +105,18 @@ jobs:
 
     - name: Replace istore_backend.lua
       run: |
-        if [ -f "$GITHUB_WORKSPACE/$ISTORE_BACKEND_SRC" ]; then
-          DST_PATH="openwrt/$ISTORE_BACKEND_DST"
-          mkdir -p "$(dirname "$DST_PATH")"
-          cp -f "$GITHUB_WORKSPACE/$ISTORE_BACKEND_SRC" "$DST_PATH"
-          echo "✅ Replaced: $DST_PATH"
-        else
+        if [ ! -f "$GITHUB_WORKSPACE/$ISTORE_BACKEND_SRC" ]; then
           echo "❌ Source file not found: $GITHUB_WORKSPACE/$ISTORE_BACKEND_SRC"
+          exit 1
+        fi
+        
+        TARGET_FILE=$(find openwrt -path "*/controller/istore_backend.lua" -type f | head -n 1)
+        
+        if [ -n "$TARGET_FILE" ]; then
+          cp -f "$GITHUB_WORKSPACE/$ISTORE_BACKEND_SRC" "$TARGET_FILE"
+          echo "✅ Replaced: $TARGET_FILE"
+        else
+          echo "❌ Target file controller/istore_backend.lua not found in openwrt!"
           exit 1
         fi
 
