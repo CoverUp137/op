@@ -124,17 +124,7 @@ jobs:
         cd openwrt
         sed -i '/^PKG_BUILD_PARALLEL:=1/a PKG_FORTIFY_SOURCE:=0' feeds/packages/libs/libxcrypt/Makefile
         $GITHUB_WORKSPACE/$DIY_P2_SH
-        
-    - name: Overlay iStoreX CPU temp
-      run: |
-        mkdir -p openwrt/files/sbin
-        printf '%s\n' \
-          '#!/bin/sh' \
-          't=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null) || exit 0' \
-          '[ -n "$t" ] && echo "CPU $((t / 1000))°C"' \
-          > openwrt/files/sbin/cpuinfo
-        chmod +x openwrt/files/sbin/cpuinfo
-        
+             
          
     - name: Download package
       id: package
