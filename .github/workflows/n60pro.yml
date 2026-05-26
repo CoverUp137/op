@@ -33,7 +33,7 @@ jobs:
         echo "=============================================================================="
 
     - name: "Optimize Disk Space"
-      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.1"
+      uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.0"
       with:
         operate_sudo: "True"
         general_include: ".+"
