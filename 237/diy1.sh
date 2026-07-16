@@ -28,3 +28,6 @@ git clone https://github.com/linkease/istore.git package/istore
 git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
 
 
+# 主题
+git clone https://github.com/ChesterGoodiny/luci-theme-proton2025 package/luci-theme-proton2025
+
