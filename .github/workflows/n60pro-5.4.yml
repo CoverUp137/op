@@ -9,7 +9,7 @@ on:
   
 
 env:
-  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
+  REPO_URL: https://github.com/CoverUp137/immortalwrt-mt798x-6.6.git
   REPO_BRANCH: 2410
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: 237/n60pro5.4.config
