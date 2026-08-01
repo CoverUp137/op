@@ -18,11 +18,11 @@ git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-part
 # git clone https://github.com/papagaye744/luci-theme-design package/luci-theme-design
 
 
-echo 'src-git nas https://github.com/linkease/nas-packages.git;master' >> feeds.conf.default
-echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >> feeds.conf.default
+# echo 'src-git nas https://github.com/linkease/nas-packages.git;master' >> feeds.conf.default
+# echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >> feeds.conf.default
 
 #store商店
-git clone https://github.com/linkease/istore.git package/istore
+# git clone https://github.com/linkease/istore.git package/istore
 
 # lucky大吉
 git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
