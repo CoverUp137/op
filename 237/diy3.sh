@@ -3,7 +3,7 @@
 # git clone https://github.com/sirpdboy/luci-app-timecontrol package/luci-app-timecontrol
 
 # 一键分区
-git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
+# git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-partexp
 
 
 # 任务设置taskplan
@@ -22,7 +22,7 @@ git clone https://github.com/sirpdboy/luci-app-partexp.git package/luci-app-part
 # echo 'src-git nas_luci https://github.com/linkease/nas-packages-luci.git;main' >> feeds.conf.default
 
 #store商店
-# git clone https://github.com/linkease/istore.git package/istore
+git clone https://github.com/linkease/istore.git package/istore
 
 # lucky大吉
 git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
