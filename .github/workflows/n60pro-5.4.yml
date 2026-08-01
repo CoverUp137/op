@@ -14,7 +14,7 @@ env:
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: 237/n60pro5.4.config
   DIY_P1_SH: 237/diy3.sh
-  DIY_P2_SH: 237/diy1.sh
+  DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
