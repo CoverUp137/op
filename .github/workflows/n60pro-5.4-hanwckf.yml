@@ -12,7 +12,7 @@ env:
   REPO_URL: https://github.com/CoverUp137/immortalwrt-mt798x.git
   REPO_BRANCH: openwrt-21.02
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 237/n60pro5.4.config
+  CONFIG_FILE: 237/hkn60pro.config
   DIY_P1_SH: 237/diy3.sh
   DIY_P2_SH: 237/diy2.sh
   UPLOAD_BIN_DIR: false
