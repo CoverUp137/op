@@ -171,7 +171,7 @@ jobs:
         echo "
               
             
-            1:  使用hanwckf大佬源码编译的高功率wifi固件，有MTK硬件加速，内核5.4
+            1:  使用hanwckf大佬源码编译的固件，有MTK硬件加速，内核5.4
             2:  补全docker 依赖,添加USB网络驱动
             3:  添加openclash,网络唤醒，store商店，lucky等插件
             
