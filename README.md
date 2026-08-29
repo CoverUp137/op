@@ -39,12 +39,9 @@
 
 ### 🤝 编译源码
 - (https://github.com/padavanonly/immortalwrt-mt798x-6.6.git)
-- (https://github.com/immortalwrt/immortalwrt.git)
 - (https://github.com/LiBwrt/openwrt-6.x.git)
-### 🤝 打包脚本
-- (https://github.com/ophub/flippy-openwrt-actions.git)
-- (https://github.com/unifreq/openwrt_packit.git)
-- (https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#%E4%BD%BF%E7%94%A8-github-actions-%E8%BF%9B%E8%A1%8C%E7%BC%96%E8%AF%91)
+- (https://github.com/fanchmwrt/fanchmwrt.git)
+- (https://github.com/hanwckf/immortalwrt-mt798x.git)
 
 
 
