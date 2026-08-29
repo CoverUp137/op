@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/5fcf18e1-ed16-49d3-9004-5301ac8d4309" alt="OpenWrt" />
+    <img src="https://github.com/CoverUp137/op/blob/main/O1CN014IDQMu1N82cYNJeW7_!!61221524.jpg_q50s50.jpg?raw=true" alt="OpenWrt" />
 </div>
 
 
