@@ -31,3 +31,5 @@ git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
 # 主题
 git clone https://github.com/ChesterGoodiny/luci-theme-proton2025 package/luci-theme-proton2025
 
+git clone https://github.com/kenzok8/openwrt-clashoo.git package/openwrt-clashoo
+
