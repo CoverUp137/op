@@ -1,0 +1,428 @@
+name: N60pro 统一构建
+
+# 一个工作流管四条构建线：
+#   n60pro            padavanonly 6.6 + 基础配置（默认）
+#   n60pro-dae        padavanonly 6.6 + dae/daed 透明代理
+#   n60pro-5.4        237 源 5.4 内核
+#   n60pro-5.4-hanwckf hanwckf 21.02 源（hkn 配置）
+#   all               四条并行（注意消耗 runner 时长，约 4 倍）
+#
+# 支持的触发方式：
+#   1. Actions 页面手动 Run workflow（选参数）
+#   2. gh CLI: gh workflow run n60pro-build.yml -f flavor=n60pro
+#   3. repository_dispatch 事件类型 build-n60pro（默认走 n60pro 线）
+
+on:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: 选择构建线
+        required: true
+        default: n60pro
+        type: choice
+        options:
+          - n60pro
+          - n60pro-dae
+          - n60pro-5.4
+          - n60pro-5.4-hanwckf
+          - all
+      upload_release:
+        description: 上传到 Release
+        type: boolean
+        default: true
+      upload_artifact:
+        description: 额外上传 Actions Artifact（占存储配额，调试用）
+        type: boolean
+        default: false
+      use_dl_cache:
+        description: 复用 dl 源码包缓存（仓库缓存总量上限 10GB，四条线共用会互相挤掉）
+        type: boolean
+        default: false
+      runner:
+        description: 运行器标签（自建机改这里，如 self-hosted）
+        default: ubuntu-latest
+        type: string
+  repository_dispatch:
+    types: [build-n60pro]
+
+permissions:
+  contents: write
+
+# 同一个 flavor 同时只跑一个，避免连点造成重复编译；不 cancel 已有任务（编译浪费）
+concurrency:
+  group: n60pro-${{ github.event.inputs.flavor || 'dispatch' }}
+  cancel-in-progress: false
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  prepare:
+    name: 生成构建矩阵
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - name: 生成矩阵
+        id: gen
+        env:
+          FLAVOR: ${{ github.event.inputs.flavor || 'n60pro' }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+
+          flavor = (os.environ.get('FLAVOR') or 'n60pro').strip()
+
+          F = {
+            'n60pro': dict(
+                name='n60pro',
+                repo='https://github.com/padavanonly/immortalwrt-mt798x-6.6.git',
+                branch='openwrt-24.10-6.6',
+                config='237/N60pro.config',
+                diy1='237/diy1.sh',
+                diy2='237/diy2.sh',
+                tag='netcore-n60pro',
+                kernel='6.6',
+                rm_factory='false',
+                note='',
+            ),
+            'n60pro-dae': dict(
+                name='n60pro-dae',
+                repo='https://github.com/padavanonly/immortalwrt-mt798x-6.6.git',
+                branch='openwrt-24.10-6.6',
+                config='237/N60pro-dae.config',
+                diy1='237/diy1.sh',
+                diy2='237/diy2.sh',
+                tag='netcore-n60pro-dae',
+                kernel='6.6',
+                rm_factory='false',
+                note='> 本版集成 dae / daed，支持 eBPF 透明代理。',
+            ),
+            'n60pro-5.4': dict(
+                name='n60pro-5.4',
+                repo='https://github.com/CoverUp137/immortalwrt-mt798x-6.6.git',
+                branch='2410',
+                config='237/n60pro5.4.config',
+                diy1='237/diy3.sh',
+                diy2='237/diy2.sh',
+                tag='netcore-n60pro-5.4',
+                kernel='5.4',
+                rm_factory='true',
+                note='',
+            ),
+            'n60pro-5.4-hanwckf': dict(
+                name='n60pro-5.4-hanwckf',
+                repo='https://github.com/CoverUp137/immortalwrt-mt798x.git',
+                branch='openwrt-21.02',
+                config='237/hkn60pro.config',
+                diy1='237/diy3.sh',
+                diy2='237/diy2.sh',
+                tag='netcore-n60pro-hanwckf',
+                kernel='5.4',
+                rm_factory='true',
+                note='> 基于 hanwckf 21.02 源构建。',
+            ),
+          }
+
+          if flavor == 'all':
+              keys = list(F)
+          elif flavor in F:
+              keys = [flavor]
+          else:
+              raise SystemExit('未知的 flavor: %s（可选：%s, all）' % (flavor, ', '.join(F)))
+
+          matrix = {'include': [F[k] for k in keys]}
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+              f.write('matrix=' + json.dumps(matrix, ensure_ascii=False) + '\n')
+          print('构建线：', ', '.join(keys))
+          PY
+
+  build:
+    name: ${{ matrix.name }}
+    needs: prepare
+    runs-on: ${{ github.event.inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      UPLOAD_RELEASE: ${{ github.event.inputs.upload_release || 'true' }}
+      UPLOAD_ARTIFACT: ${{ github.event.inputs.upload_artifact || 'false' }}
+      USE_DL_CACHE: ${{ github.event.inputs.use_dl_cache || 'false' }}
+      REPO_URL: ${{ matrix.repo }}
+      REPO_BRANCH: ${{ matrix.branch }}
+      CONFIG_FILE: ${{ matrix.config }}
+      DIY_P1_SH: ${{ matrix.diy1 }}
+      DIY_P2_SH: ${{ matrix.diy2 }}
+      RELEASE_TAG: ${{ matrix.tag }}
+      KERNEL_VER: ${{ matrix.kernel }}
+      EXTRA_NOTE: ${{ matrix.note }}
+    steps:
+      - name: 构建参数
+        run: |
+          echo "构建线      : ${{ matrix.name }}"
+          echo "源码        : $REPO_URL ($REPO_BRANCH)"
+          echo "配置        : $CONFIG_FILE"
+          echo "diy 脚本    : $DIY_P1_SH + $DIY_P2_SH"
+          echo "Release tag : $RELEASE_TAG"
+          echo "上传 Release: $UPLOAD_RELEASE"
+          df -hT /
+
+      - name: 释放磁盘空间
+        uses: hugoalh/disk-space-optimizer-ghaction@v0.8.1
+        with:
+          operate_sudo: "True"
+          general_include: ".+"
+          general_exclude: |-
+            ^GCC$
+            ^G\+\+$
+            Clang
+            LLVM
+          docker_include: ".+"
+          docker_prune: "True"
+          docker_clean: "True"
+          apt_prune: "True"
+          apt_clean: "True"
+          homebrew_prune: "True"
+          homebrew_clean: "True"
+          npm_prune: "True"
+          npm_clean: "True"
+          os_swap: "True"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 安装编译依赖
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get -qq update
+          # 核心依赖：缺一个就编不过，必须装成功
+          sudo -E apt-get -qq install -y build-essential clang flex bison g++ gawk \
+            gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
+            python3 python3-setuptools python3-pyelftools rsync swig unzip zlib1g-dev \
+            file wget curl ccache libelf-dev cpio p7zip-full squashfs-tools \
+            device-tree-compiler subversion xmlto libltdl-dev libmpc-dev libmpfr-dev \
+            texinfo vim
+          # 可选依赖：个别包名在 24.04 上变成 transitional，装不上也不影响主流程
+          sudo -E apt-get -qq install -y upx-ucl ecj fastjar java-propose-classpath xxd \
+            genisoimage libglib2.0-dev libgmp3-dev lrzsz msmtp aria2 \
+            libncurses5-dev libncursesw5-dev || true
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
+          df -hT /
+
+      - name: 克隆源码
+        run: git clone --depth=1 "$REPO_URL" -b "$REPO_BRANCH" openwrt
+
+      - name: 恢复 dl 缓存
+        if: env.USE_DL_CACHE == 'true'
+        uses: actions/cache@v4
+        with:
+          path: openwrt/dl
+          key: dl-${{ matrix.name }}-${{ hashFiles(matrix.config) }}
+          restore-keys: |
+            dl-${{ matrix.name }}-${{ hashFiles(matrix.config) }}-
+            dl-${{ matrix.name }}-
+
+      - name: 载入自定义 feeds / diy1
+        run: |
+          chmod +x "$DIY_P1_SH"
+          cd openwrt
+          "$GITHUB_WORKSPACE/$DIY_P1_SH"
+
+      - name: 更新 feeds
+        run: cd openwrt && ./scripts/feeds update -a
+
+      - name: 安装 feeds
+        run: cd openwrt && ./scripts/feeds install -a
+
+      - name: 应用配置 / diy2
+        run: |
+          cp -f "$GITHUB_WORKSPACE/$CONFIG_FILE" openwrt/.config
+          chmod +x "$DIY_P2_SH"
+          cd openwrt
+          "$GITHUB_WORKSPACE/$DIY_P2_SH"
+          # 配置里若有依赖新包的行，defconfig 会补齐
+          make defconfig
+
+      - name: 预下载源码包
+        run: |
+          cd openwrt
+          make download -j"$(( $(nproc) * 3 / 2 ))" || make download -j1
+          # 清理下载残缺的小文件（小于 1KB 基本都是错误页）
+          find dl -size -1024c -delete
+          du -sh dl
+
+      - name: 编译
+        id: compile
+        run: |
+          cd openwrt
+          JOBS=$(( $(nproc) * 3 / 2 ))
+          echo "开始编译：$(nproc) 核，-j$JOBS，开始时间 $(date '+%F %T')"
+          START=$(date +%s)
+          set -o pipefail
+          if ! make -j"$JOBS" 2>&1 | tee build.log; then
+            echo "::warning::并行编译失败，降级单线程重试（这是常见的依赖顺序问题，不代表配置有错）"
+            make -j1 2>&1 | tee -a build.log || make -j1 V=s 2>&1 | tee -a build.log
+          fi
+          echo "BUILD_SECONDS=$(( $(date +%s) - START ))" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "构建耗时 $(( ($(date +%s) - START) / 60 )) 分钟"
+
+      - name: 收集编译日志（仅失败时）
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ matrix.name }}
+          path: openwrt/build.log
+          retention-days: 7
+
+      - name: 检查磁盘
+        if: always()
+        run: df -hT /
+
+      - name: 整理产物
+        id: organize
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        run: |
+          cd openwrt/bin/targets/*/*
+          rm -rf ./*.manifest ./*bl2.bin ./version.buildinfo ./profiles.json ./feeds.buildinfo
+          if [ "${{ matrix.rm_factory }}" = "true" ]; then
+            rm -rf ./*factory.bin
+          fi
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+          ls -lh "$PWD"/*.bin ./sha256sums 2>/dev/null || true
+
+      - name: 打包插件目录
+        id: plugins
+        if: steps.organize.outputs.status == 'success' && !cancelled()
+        run: |
+          PKG_DIR="$FIRMWARE/packages"
+          if [ -d "$PKG_DIR" ]; then
+            tar -czf "$GITHUB_WORKSPACE/packages.tar.gz" -C "$PKG_DIR" .
+            echo "PACKAGES_TAR=$GITHUB_WORKSPACE/packages.tar.gz" >> $GITHUB_ENV
+          else
+            echo "没有 packages 目录，跳过"
+          fi
+
+      - name: 上传固件 Artifact
+        if: env.UPLOAD_ARTIFACT == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.name }}
+          path: ${{ env.FIRMWARE }}/*.bin
+          retention-days: 15
+
+      - name: 生成 Release 说明
+        id: notes
+        if: env.UPLOAD_RELEASE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
+        run: |
+          BUILD_TIME="$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分')"
+          {
+            echo "$EXTRA_NOTE"
+            echo ""
+            echo "### 磊科 Netcore N60 Pro"
+            echo ""
+            echo "1. 使用 237 大佬源码编译的高功率 WiFi 固件，内核 \`$KERNEL_VER\`"
+            echo "2. 补全 dockerman 依赖以及其他插件缺少的 kmod 依赖"
+            echo "3. 补全 USB 网络驱动"
+            echo "4. 含 istore 软件商店、lucky、网络唤醒、upnp、ftp、一键分区等插件"
+            echo "   科学上网插件请在 系统 → 软件包 内自行安装"
+            echo "5. 编译出的插件与 kmod 依赖在下方 \`packages.tar.gz\` 中查找（无需求可忽略）"
+            echo ""
+            echo "| 项目 | 值 |"
+            echo "| --- | --- |"
+            echo "| 设备 | 磊科 Netcore N60 Pro |"
+            echo "| 架构 | MediaTek MT7986A (Filogic 830) |"
+            echo "| 内存 / 闪存 | 512MB(2GB) / 128MB |"
+            echo "| 源码 | \`$REPO_URL\` |"
+            echo "| 分支 | \`$REPO_BRANCH\` |"
+            echo "| 配置 | \`$CONFIG_FILE\` |"
+            echo "| 编译时间 | $BUILD_TIME |"
+            echo "| 编译耗时 | $((${BUILD_SECONDS:-0} / 60)) 分钟 |"
+            echo ""
+            echo "刷机：关机长按 reset 5 秒，网线插**千兆 LAN**口（不要用 2.5G 口），浏览器打开 192.168.1.1 进入 uboot 上传固件。"
+            echo "管理地址 \`192.168.2.1\`，用户名 \`root\`，密码 \`password\`（或空）。"
+            echo ""
+            echo "校验：用附件 \`sha256sums\` 校验固件完整性（\`sha256sum -c sha256sums\`）。"
+          } > "$GITHUB_WORKSPACE/release-notes.md"
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: 清理该 Release 里的过期资产
+        if: steps.notes.outputs.status == 'success' && !cancelled()
+        env:
+          GH_TOKEN: ${{ secrets.TOKEN }}
+        run: |
+          # 只保留本次会上传的文件，删掉旧版本残留（例如换过名字的固件）
+          if ! gh release view "$RELEASE_TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release 尚不存在，跳过清理"
+            exit 0
+          fi
+          KEEP="$(mktemp)"
+          {
+            ls -1 "$FIRMWARE"/*.bin 2>/dev/null || true
+            ls -1 "$FIRMWARE"/sha256sums 2>/dev/null || true
+            if [ -n "${PACKAGES_TAR:-}" ] && [ -f "$PACKAGES_TAR" ]; then echo "$PACKAGES_TAR"; fi
+          } | xargs -r -n1 basename 2>/dev/null | sort -u > "$KEEP"
+          # 产物没收集到就说明前面出问题了，别在这个状态下删任何东西
+          if ! grep -q '\.bin$' "$KEEP"; then
+            echo "本次产物为空，跳过清理"
+            exit 0
+          fi
+          gh release view "$RELEASE_TAG" -R "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | while read -r a; do
+            if ! grep -qxF "$a" "$KEEP"; then
+              echo "删除旧资产：$a"
+              gh release delete-asset "$RELEASE_TAG" "$a" -R "$GITHUB_REPOSITORY" -y || true
+            fi
+          done
+          rm -f "$KEEP"
+
+      - name: 上传固件到 Release
+        if: steps.notes.outputs.status == 'success' && !cancelled()
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          body_path: release-notes.md
+          files: |
+            ${{ env.FIRMWARE }}/*.bin
+            ${{ env.FIRMWARE }}/sha256sums
+            ${{ env.PACKAGES_TAR }}
+          fail_on_unmatched_files: false
+          make_latest: true
+
+      - name: 写入任务摘要
+        if: always()
+        run: |
+          {
+            echo "### ${{ matrix.name }} · ${{ job.status }}"
+            echo ""
+            echo "- 源码：\`$REPO_URL\` @ \`$REPO_BRANCH\`"
+            echo "- 配置：\`$CONFIG_FILE\`"
+            echo "- 内核：$KERNEL_VER"
+            echo "- 编译耗时：$((${BUILD_SECONDS:-0} / 60)) 分钟"
+            if [ -n "${FIRMWARE:-}" ] && [ -d "$FIRMWARE" ]; then
+              echo ""
+              echo "| 文件 | 大小 |"
+              echo "| --- | --- |"
+              for f in "$FIRMWARE"/*.bin; do
+                [ -e "$f" ] || continue
+                echo "| \`$(basename "$f")\` | $(du -h "$f" | cut -f1) |"
+              done
+            fi
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: 清理旧运行记录
+        if: always()
+        continue-on-error: true
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 7
+          keep_minimum_runs: 3
