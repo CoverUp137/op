@@ -1,38 +1,75 @@
 name: 构建固件
 
-# 最简单的用法：Actions 页面 → 构建固件 → Run workflow → 不用填任何东西，直接点。
-# 编译完成后固件在该次运行的 Artifacts 里下载，不需要 token、不发 Release。
-# 想切换构建目标，只改下面 env 里的 5 行。
+# ══════════════════════════════════════════════════════════════
+#  怎么用（小白版）：
+#    1. 打开 Actions → 左边选「构建固件」→ 右边 Run workflow
+#    2. 第一个下拉框选源码（默认 padavanonly 6.6，不动就行）
+#    3. 第二个下拉框选配置（仓库里 237/ 下的 .config）
+#    4. 点绿色的 Run workflow
+#    5. 等 2~3 小时，编译完成后在页面底部 Artifacts 里下载固件
+#
+#  配置和 diy 脚本全部来自本仓库，不需要懂代码，也不用 token。
+# ══════════════════════════════════════════════════════════════
 
 on:
   workflow_dispatch:
     inputs:
+      source:
+        description: 选择 OpenWrt 源码
+        required: true
+        default: padavanonly 6.6
+        type: choice
+        options:
+          - padavanonly 6.6
+          - CoverUp137 5.4（2410）
+          - hanwckf 21.02
+          - LiBwrt 6.x
+          - fanchmwrt 25.12
+          - 自定义
+
       config:
-        description: '配置文件（留空就用下面 env 里的 CONFIG_FILE）'
+        description: 选择配置文件（仓库里的）
+        required: true
+        default: 237/N60pro.config
+        type: choice
+        options:
+          - 237/N60pro.config
+          - 237/N60pro-dae.config
+          - 237/n60pro5.4.config
+          - 237/hkn60pro.config
+
+      diy:
+        description: 附加插件脚本
+        required: true
+        default: 自动（按配置选）
+        type: choice
+        options:
+          - 自动（按配置选）
+          - 237/diy1.sh
+          - 237/diy3.sh
+          - 不加载
+
+      custom_repo:
+        description: '自定义源码地址（上面选「自定义」时填，如 https://github.com/xxx/yyy.git）'
         required: false
         default: ''
+        type: string
+
+      custom_branch:
+        description: '自定义分支名（上面选「自定义」时填）'
+        required: false
+        default: ''
+        type: string
+
       release:
-        description: '发布到 Release（需要 secrets.TOKEN；不勾就只留 Artifact）'
+        description: '发布到 Release（需要仓库里有 secrets.TOKEN）'
         type: boolean
         default: false
 
-  # 需要「改了配置就自动编译」就取消下面注释
-  # push:
-  #   paths:
-  #     - '237/**'
-
 env:
-  # ─────── 只改这 5 行就能换固件 ───────
-  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
-  REPO_BRANCH: openwrt-24.10-6.6
-  CONFIG_FILE: 237/N60pro.config
-  DIY_P1_SH: 237/diy1.sh
-  DIY_P2_SH: 237/diy2.sh
-  # 发 Release 时用的 tag（勾了 release 才用得上）
-  RELEASE_TAG: netcore-n60pro
-  # ─────────────────────────────────
-
   TZ: Asia/Shanghai
+  # 所有编译都用的 DIY 第二步：改默认 IP、改主机名
+  DIY_P2_SH: 237/diy2.sh
 
 jobs:
   build:
@@ -40,6 +77,85 @@ jobs:
     timeout-minutes: 300
 
     steps:
+      - name: Checkout（拿到仓库里的配置和脚本）
+        uses: actions/checkout@v4
+
+      - name: 解析源码 / 配置 / 脚本
+        id: resolve
+        env:
+          SRC: ${{ github.event.inputs.source }}
+          CFG: ${{ github.event.inputs.config }}
+          DIY: ${{ github.event.inputs.diy }}
+          CUSTOM_REPO: ${{ github.event.inputs.custom_repo }}
+          CUSTOM_BRANCH: ${{ github.event.inputs.custom_branch }}
+        run: |
+          case "$SRC" in
+            "padavanonly 6.6"*)
+              REPO="https://github.com/padavanonly/immortalwrt-mt798x-6.6.git"; BRANCH="openwrt-24.10-6.6"; KVER="6.6" ;;
+            "CoverUp137 5.4"*)
+              REPO="https://github.com/CoverUp137/immortalwrt-mt798x-6.6.git"; BRANCH="2410"; KVER="5.4" ;;
+            "hanwckf 21.02"*)
+              REPO="https://github.com/hanwckf/immortalwrt-mt798x.git"; BRANCH="openwrt-21.02"; KVER="5.4" ;;
+            "LiBwrt 6.x"*)
+              REPO="https://github.com/LiBwrt/openwrt-6.x.git"; BRANCH="25.12-nss"; KVER="6.12" ;;
+            "fanchmwrt 25.12"*)
+              REPO="https://github.com/fanchmwrt/fanchmwrt.git"; BRANCH="fanchmwrt-25.12.6"; KVER="6.12" ;;
+            "自定义"*)
+              REPO="$CUSTOM_REPO"; BRANCH="$CUSTOM_BRANCH"; KVER="自定义" ;;
+            *)
+              echo "::error::没识别到源码选项：$SRC"; exit 1 ;;
+          esac
+
+          if [ -z "$REPO" ] || [ -z "$BRANCH" ]; then
+            echo "::error::选了「自定义」但仓库地址或分支没填"; exit 1
+          fi
+
+          # 配置文件必须存在于仓库里
+          if [ ! -f "$GITHUB_WORKSPACE/$CFG" ]; then
+            echo "::error::仓库里找不到配置文件 $CFG"; exit 1
+          fi
+
+          # diy 脚本：自动模式下，6.6 的两份配置用 diy1，5.4/21.02 用 diy3
+          case "$DIY" in
+            "不加载") DIY_SH="" ;;
+            "自动"*)
+              case "$CFG" in
+                *n60pro5.4.config|*hkn60pro.config) DIY_SH="237/diy3.sh" ;;
+                *) DIY_SH="237/diy1.sh" ;;
+              esac ;;
+            *) DIY_SH="$DIY" ;;
+          esac
+          if [ -n "$DIY_SH" ] && [ ! -f "$GITHUB_WORKSPACE/$DIY_SH" ]; then
+            echo "::error::仓库里找不到脚本 $DIY_SH"; exit 1
+          fi
+
+          # 源码和分支能不能拉到，提前报错，别等 3 小时
+          if ! git ls-remote --exit-code --heads "$REPO" "$BRANCH" >/dev/null 2>&1; then
+            echo "::error::源码或分支不存在：$REPO ($BRANCH)"; exit 1
+          fi
+
+          {
+            echo "REPO_URL=$REPO"
+            echo "REPO_BRANCH=$BRANCH"
+            echo "KERNEL=$KVER"
+            echo "CONFIG_FILE=$CFG"
+            echo "DIY_P1_SH=$DIY_SH"
+            # artifact / release 里用的名字
+            echo "JOB_NAME=$(basename "$CFG" .config)-$(basename "$BRANCH")"
+          } >> $GITHUB_ENV
+
+          {
+            echo "### 构建参数"
+            echo ""
+            echo "| 项目 | 值 |"
+            echo "| --- | --- |"
+            echo "| 源码 | \`$REPO\` |"
+            echo "| 分支 | \`$BRANCH\` |"
+            echo "| 内核 | $KVER |"
+            echo "| 配置 | \`$CFG\` |"
+            echo "| 插件脚本 | \`${DIY_SH:-不加载}\` |"
+          } >> $GITHUB_STEP_SUMMARY
+
       - name: 释放磁盘空间
         uses: hugoalh/disk-space-optimizer-ghaction@v0.8.1
         with:
@@ -61,9 +177,6 @@ jobs:
           npm_clean: "True"
           os_swap: "True"
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: 安装编译环境
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -76,23 +189,27 @@ jobs:
       - name: 克隆源码
         run: git clone --depth=1 "$REPO_URL" -b "$REPO_BRANCH" openwrt
 
-      - name: 加载自定义包 + 更新 feeds
+      - name: 加载附加插件 + 更新 feeds
         run: |
-          chmod +x "$DIY_P1_SH"
           cd openwrt
-          "$GITHUB_WORKSPACE/$DIY_P1_SH"
+          if [ -n "$DIY_P1_SH" ]; then
+            chmod +x "$GITHUB_WORKSPACE/$DIY_P1_SH"
+            "$GITHUB_WORKSPACE/$DIY_P1_SH"
+          else
+            echo "跳过附加插件"
+          fi
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
       - name: 应用配置
         run: |
-          CFG="${{ github.event.inputs.config }}"
-          [ -z "$CFG" ] && CFG="$CONFIG_FILE"
-          cp -f "$GITHUB_WORKSPACE/$CFG" openwrt/.config
-          chmod +x "$DIY_P2_SH"
+          cp -f "$GITHUB_WORKSPACE/$CONFIG_FILE" openwrt/.config
           cd openwrt
+          chmod +x "$GITHUB_WORKSPACE/$DIY_P2_SH"
           "$GITHUB_WORKSPACE/$DIY_P2_SH"
           make defconfig
+          # 把最终生效的目标设备打出来，方便核对选错配置
+          grep -E '^CONFIG_TARGET.*DEVICE.*=y' .config || true
 
       - name: 下载源码包
         run: |
@@ -104,7 +221,7 @@ jobs:
         run: |
           cd openwrt
           JOBS=$(( $(nproc) * 3 / 2 ))
-          echo "开始：$(date '+%F %T')，-j$JOBS"
+          echo "开始：$(date '+%F %T')  源码 $REPO_URL  分支 $REPO_BRANCH  配置 $CONFIG_FILE"
           make -j"$JOBS" || make -j1 || make -j1 V=s
           echo "完成：$(date '+%F %T')"
 
@@ -118,22 +235,30 @@ jobs:
       - name: 上传固件（Artifacts，不需要 token）
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-${{ github.run_number }}
+          name: firmware-${{ env.JOB_NAME }}-${{ github.run_number }}
           path: ${{ env.FIRMWARE }}
           retention-days: 30
 
-      - name: 发布到 Release（可选）
-        if: github.event.inputs.release == 'true' && env.RELEASE_TAG != ''
+      - name: 发布到 Release（可选，勾了才执行）
+        if: github.event.inputs.release == 'true'
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: ${{ env.RELEASE_TAG }}
+          tag_name: n60pro-${{ env.JOB_NAME }}
+          name: n60pro-${{ env.JOB_NAME }}
           body: |
-            磊科 Netcore N60 Pro · 内核 6.6
-            管理地址 192.168.2.1，用户名 root，密码 password（或空）
-            校验：sha256sum -c sha256sums
+            | 项目 | 值 |
+            | --- | --- |
+            | 设备 | 磊科 Netcore N60 Pro |
+            | 源码 | `${{ env.REPO_URL }}` |
+            | 分支 | `${{ env.REPO_BRANCH }}` |
+            | 内核 | ${{ env.KERNEL }} |
+            | 配置 | `${{ env.CONFIG_FILE }}` |
+
+            管理地址 `192.168.2.1`，用户名 `root`，密码 `password`（或空）。
+            刷机：关机长按 reset 5 秒，网线插千兆 LAN 口（不要用 2.5G 口），浏览器打开 192.168.1.1 进 uboot 上传固件。
+            校验：`sha256sum -c sha256sums`
           files: |
             ${{ env.FIRMWARE }}/*.bin
             ${{ env.FIRMWARE }}/sha256sums
