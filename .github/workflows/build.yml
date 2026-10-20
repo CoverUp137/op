@@ -1,0 +1,140 @@
+name: 构建固件
+
+# 最简单的用法：Actions 页面 → 构建固件 → Run workflow → 不用填任何东西，直接点。
+# 编译完成后固件在该次运行的 Artifacts 里下载，不需要 token、不发 Release。
+# 想切换构建目标，只改下面 env 里的 5 行。
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: '配置文件（留空就用下面 env 里的 CONFIG_FILE）'
+        required: false
+        default: ''
+      release:
+        description: '发布到 Release（需要 secrets.TOKEN；不勾就只留 Artifact）'
+        type: boolean
+        default: false
+
+  # 需要「改了配置就自动编译」就取消下面注释
+  # push:
+  #   paths:
+  #     - '237/**'
+
+env:
+  # ─────── 只改这 5 行就能换固件 ───────
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
+  REPO_BRANCH: openwrt-24.10-6.6
+  CONFIG_FILE: 237/N60pro.config
+  DIY_P1_SH: 237/diy1.sh
+  DIY_P2_SH: 237/diy2.sh
+  # 发 Release 时用的 tag（勾了 release 才用得上）
+  RELEASE_TAG: netcore-n60pro
+  # ─────────────────────────────────
+
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+
+    steps:
+      - name: 释放磁盘空间
+        uses: hugoalh/disk-space-optimizer-ghaction@v0.8.1
+        with:
+          operate_sudo: "True"
+          general_include: ".+"
+          general_exclude: |-
+            ^GCC$
+            ^G\+\+$
+            Clang
+            LLVM
+          docker_include: ".+"
+          docker_prune: "True"
+          docker_clean: "True"
+          apt_prune: "True"
+          apt_clean: "True"
+          homebrew_prune: "True"
+          homebrew_clean: "True"
+          npm_prune: "True"
+          npm_clean: "True"
+          os_swap: "True"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 安装编译环境
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
+          sudo timedatectl set-timezone "$TZ"
+          sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
+          df -hT /
+
+      - name: 克隆源码
+        run: git clone --depth=1 "$REPO_URL" -b "$REPO_BRANCH" openwrt
+
+      - name: 加载自定义包 + 更新 feeds
+        run: |
+          chmod +x "$DIY_P1_SH"
+          cd openwrt
+          "$GITHUB_WORKSPACE/$DIY_P1_SH"
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: 应用配置
+        run: |
+          CFG="${{ github.event.inputs.config }}"
+          [ -z "$CFG" ] && CFG="$CONFIG_FILE"
+          cp -f "$GITHUB_WORKSPACE/$CFG" openwrt/.config
+          chmod +x "$DIY_P2_SH"
+          cd openwrt
+          "$GITHUB_WORKSPACE/$DIY_P2_SH"
+          make defconfig
+
+      - name: 下载源码包
+        run: |
+          cd openwrt
+          make download -j"$(( $(nproc) * 3 / 2 ))" || make download -j1
+          find dl -size -1024c -delete
+
+      - name: 编译
+        run: |
+          cd openwrt
+          JOBS=$(( $(nproc) * 3 / 2 ))
+          echo "开始：$(date '+%F %T')，-j$JOBS"
+          make -j"$JOBS" || make -j1 || make -j1 V=s
+          echo "完成：$(date '+%F %T')"
+
+      - name: 整理产物
+        run: |
+          cd openwrt/bin/targets/*/*
+          rm -rf ./*.manifest ./*bl2.bin ./version.buildinfo ./profiles.json ./feeds.buildinfo
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          ls -lh "$PWD"/*.bin
+
+      - name: 上传固件（Artifacts，不需要 token）
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ github.run_number }}
+          path: ${{ env.FIRMWARE }}
+          retention-days: 30
+
+      - name: 发布到 Release（可选）
+        if: github.event.inputs.release == 'true' && env.RELEASE_TAG != ''
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          body: |
+            磊科 Netcore N60 Pro · 内核 6.6
+            管理地址 192.168.2.1，用户名 root，密码 password（或空）
+            校验：sha256sum -c sha256sums
+          files: |
+            ${{ env.FIRMWARE }}/*.bin
+            ${{ env.FIRMWARE }}/sha256sums
+          fail_on_unmatched_files: false
