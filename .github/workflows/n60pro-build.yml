@@ -38,10 +38,6 @@ on:
         description: 复用 dl 源码包缓存（仓库缓存总量上限 10GB，四条线共用会互相挤掉）
         type: boolean
         default: false
-      use_ccache:
-        description: 复用 ccache 编译缓存（首次无收益，之后通常省 20~40% 编译时间）
-        type: boolean
-        default: false
       runner:
         description: 运行器标签（自建机改这里，如 self-hosted）
         default: ubuntu-latest
@@ -153,7 +149,6 @@ jobs:
       UPLOAD_RELEASE: ${{ github.event.inputs.upload_release || 'true' }}
       UPLOAD_ARTIFACT: ${{ github.event.inputs.upload_artifact || 'false' }}
       USE_DL_CACHE: ${{ github.event.inputs.use_dl_cache || 'false' }}
-      USE_CCACHE: ${{ github.event.inputs.use_ccache || 'false' }}
       REPO_URL: ${{ matrix.repo }}
       REPO_BRANCH: ${{ matrix.branch }}
       CONFIG_FILE: ${{ matrix.config }}
@@ -231,29 +226,6 @@ jobs:
             dl-${{ matrix.name }}-${{ hashFiles(matrix.config) }}-
             dl-${{ matrix.name }}-
 
-      - name: 恢复 ccache 编译缓存
-        if: env.USE_CCACHE == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          # 滚动 key：每次都存一份新缓存；restore-keys 负责捡最近的那份
-          key: ccache-${{ matrix.name }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-${{ matrix.name }}-
-
-      - name: 启用 ccache
-        if: env.USE_CCACHE == 'true'
-        run: |
-          mkdir -p "$HOME/.ccache"
-          {
-            echo "CCACHE_DIR=$HOME/.ccache"
-            echo "CCACHE_COMPRESS=1"
-            echo "CCACHE_COMPRESSLEVEL=6"
-            echo "CCACHE_MAXSIZE=2G"
-          } >> $GITHUB_ENV
-          ccache --version | head -1
-          echo "已有缓存条目：$(ccache -s | awk '/Cache size/ {print}')"
-
       - name: 载入自定义 feeds / diy1
         run: |
           chmod +x "$DIY_P1_SH"
@@ -272,13 +244,8 @@ jobs:
           chmod +x "$DIY_P2_SH"
           cd openwrt
           "$GITHUB_WORKSPACE/$DIY_P2_SH"
-          # 打开 ccache 支持（配置里原本没有这一项，不影响固件功能，只影响编译方式）
-          if [ "$USE_CCACHE" = "true" ]; then
-            grep -q '^CONFIG_CCACHE=y' .config || echo 'CONFIG_CCACHE=y' >> .config
-          fi
           # 配置里若有依赖新包的行，defconfig 会补齐
           make defconfig
-          grep -q '^CONFIG_CCACHE=y' .config && echo "ccache 已启用" || echo "ccache 未启用"
 
       - name: 预下载源码包
         run: |
@@ -439,10 +406,6 @@ jobs:
             echo "- 配置：\`$CONFIG_FILE\`"
             echo "- 内核：$KERNEL_VER"
             echo "- 编译耗时：$((${BUILD_SECONDS:-0} / 60)) 分钟"
-            if [ "$USE_CCACHE" = "true" ]; then
-              echo "- ccache："
-              ccache -s 2>/dev/null | grep -E "Hits|Misses|Cache size" | sed 's/^ *//' | sed 's/^/  - /' || true
-            fi
             if [ -n "${FIRMWARE:-}" ] && [ -d "$FIRMWARE" ]; then
               echo ""
               echo "| 文件 | 大小 |"
